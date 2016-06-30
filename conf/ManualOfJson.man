@@ -1,0 +1,69 @@
+##  M A N U A L  O F  J S O N  A P I  ##
+
+#- C O N F I G U R A T I O N
+
+##- Local Configuration
+  "API-local-config": {
+    "API-dbName": "NameOfTheDBFile",
+    "API-modules": ["List of differents", "modules in the file"]
+  },
+
+##- Modules
+  "#ThisIsAModule": {
+    "API-url": "Url to JSON data",
+  }
+
+#- B A S I C S
+
+##- Items
+
+  "IndexInTheAPIResult": "JSON_Item",
+  "IndexOfADictionary": {
+    "IndexOfItemResult": "JSON_Item",
+  }
+
+##- Lists
+
+  "NameList": [
+    "itemList",
+    {
+      "Content": "contentItem",
+      "Of": "ofItem",
+      "This": "thisItem",
+      "List": "listItem"
+    }
+  ]
+
+#- A D V E N C E D
+
+##- Find item with condition
+Example:
+
+JSON File
+{
+  "items": [
+    { "bool": true, "succeed": "Okay" },
+    { "bool": false, "succeed": "Not bad" },
+    { "bool": true, "succeed": "Not me" }
+  ]
+}
+
+JSON API
+"Index": "items[items.bool=true].succeed" => Okay
+"Index": "items[items.bool=false].succeed" => Not bad
+
+##- Append item in list
+"Index": "itemJson + secondJson" =>
+  result["Index"][0] -> itemJson
+  result["Index"][1] -> secondJson
+
+##- Split in list
+Example:
+
+JSON File
+{
+  "item": "1,2,3,Whut ?"
+}
+
+JSON API
+"Item": "(item|,)" => result["Item"] = {"1", "2", "3", "Whut"}

@@ -1,0 +1,38 @@
+{
+  "API-local-config": {
+    "API-dbName": "NOTIFICATION.DB",
+    "API-modules": [
+      "MESSAGE",
+      "ALERT"
+    ]
+  },
+  "#MESSAGE": {
+    "API-url": "{EPITECH}/user/notification/message/?format=json",
+    "Notification": {
+      "Message": [
+        "",
+        {
+          "Title": "title",
+          "Content": "content",
+          "Author": {
+            "Name": "user.title",
+            "Url": "user.url",
+            "Picture": "user.picture"
+          },
+          "Date": "date"
+        }
+      ]
+    }
+  },
+  "#ALERT": {
+    "API-url": "{EPITECH}/user/notification/alert/?format=json",
+    "Notification": {
+      "Alert": [
+        "",
+        {
+          "Message": "title"
+        }
+      ]
+    }
+  }
+}
