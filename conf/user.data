@@ -1,0 +1,133 @@
+USER_DATA => user/{LOGIN}/?format=json
+NOTE_DATA => user/{LOGIN}/notes/?format=json
+NETSOUL_DATA => user/{LOGIN}/netsoul/?format=json
+FLAGS_DATA => user/{LOGIN}/netsoul/?format=json
+BINOMES_DATA => user/{LOGIN}/netsoul/?format=json
+MISSED_DATA => user/{LOGIN}/notification/missed/?format=json
+DOCUMENT_DATA => user/{LOGIN}/document/?format=json
+
+User
+	Login
+	UID
+	GID
+	LastName
+	FirstName
+	Info
+		BirthDate
+		BirthPlace
+		Address
+		City
+		Coutry
+		Job
+		Tel
+		Twitter
+		Facebook
+		Google+
+		Website
+		Email
+	Picture
+	Promo
+	Credits
+	GPA
+		Bachelor
+		Master
+	Spice
+		Available
+		Consumed
+	Flags
+		Ghost
+			Nb
+			Modules
+				...
+		Difficulties
+			Nb
+			Modules
+				...
+		Remarkable
+			Nb
+			Modules
+				...
+		Medal
+			Nb
+			Modules
+				...
+	Adm
+
+CurrentYear
+	Year
+	Course
+	Semester
+
+School
+	ID
+	Code
+	Title
+	ID_Promo
+		...
+	ID_Location
+		...
+	Groups
+		...
+		Title
+		Name
+		Count
+		...
+
+Netsoul
+	...
+	Date		=> 0
+	OutIdle		=> 4
+	OutActive	=> 3
+	Idle		=> 2
+	Active		=> 1
+	Average		=> 5
+	...
+
+Note
+	...
+	ScolarYear
+	Module
+	Instance
+	Title
+	DateRegister
+	Cycle
+	Credits
+	Grade
+	Barrage
+	...
+
+Pairs
+	...
+	Login
+	Picture
+	Activities
+		...
+	NbActivities
+	Weight
+	...
+
+Abscence
+	Recent
+		...
+		Module
+		Activity
+		Link
+			Module
+			Event
+		Date
+			Begin
+			End
+		Category
+		...
+	Others
+		...
+		Module
+		Activity
+		Link
+			Module
+			Event
+		Date
+			Begin
+			End
+		Category
+		...

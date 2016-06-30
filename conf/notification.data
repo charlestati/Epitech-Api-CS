@@ -1,0 +1,18 @@
+MESSAGE_DATA => user/{LOGIN}/notification/message/?format=json
+ALERT_DATA => user/{LOGIN}/notification/alert/?format=json
+
+Message
+	...
+	Title
+	Content
+	Author
+		Name
+		Url
+		Picture
+	Date
+	...
+
+Alert
+	...
+	Content
+	...
