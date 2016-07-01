@@ -24,8 +24,8 @@
           "Year": "scolaryear",
           "CurrentPromo": "active_promo",
           "Location": {
-            "Name": "location_title",
-            "Core": "instance_location"
+            "City": "location_title",
+            "Code": "instance_location"
           },
           "Status": "status",
           "Credits": "credits",
@@ -50,21 +50,16 @@
             "Name": "title_module",
             "Code": "codemodule"
           },
-          "Event": {
-            "Start": "begin_event",
-            "End": "end_event"
-          },
           "Activity": {
             "Name": "acti_title",
-            "Code": "codeacti",
             "Type": {
+              "Project": "project",
               "Name": "type_acti",
-              "Code": "type_acti_code"
+              "Code": "type_acti_code",
+              "Start": "begin_acti",
+              "End": "end_acti",
+              "Registered": "registered"
             },
-            "Project": "project",
-            "Start": "begin_acti",
-            "End": "end_acti",
-            "Registered": "registered"
           }
         }
       ]
