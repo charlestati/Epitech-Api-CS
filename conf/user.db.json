@@ -2,17 +2,37 @@
   "API-local-config": {
     "API-dbName": "USER.DB",
     "API-modules": [
-      "USER_DATA",
-      "NOTE_DATA",
-      "NETSOUL_DATA",
-      "FLAGS_DATA",
-      "BINOMES_DATA",
-      "MISSED_DATA",
-      "DOCUMENT_DATA"
+      {
+        "Name": "USER_DATA",
+        "Url": "{EPITECH}/user/{LOGIN}/?format=json"
+      },
+      {
+        "Name": "NOTE_DATA",
+        "Url": "{EPITECH}/user/{LOGIN}/notes/?format=json"
+      },
+      {
+        "Name": "NETSOUL_DATA",
+        "Url": "{EPITECH}/user/{LOGIN}/netsoul/?format=json"
+      },
+      {
+        "Name": "FLAGS_DATA",
+        "Url": "{EPITECH}/user/{LOGIN}/flags/?format=json"
+      },
+      {
+        "Name": "BINOMES_DATA",
+        "Url": "{EPITECH}/user/{LOGIN}/binome/?format=json"
+      },
+      {
+        "Name": "MISSED_DATA",
+        "Url": "{EPITECH}/user/notification/missed/?format=json"
+      },
+      {
+        "Name": "DOCUMENT_DATA",
+        "Url": "{EPITECH}/user/{LOGIN}}/document/?format=json"
+      }
     ]
   },
   "#USER_DATA": {
-    "API-url": "{EPITECH}/user/{LOGIN}/?format=json",
     "User": {
       "Login": "login",
       "UID": "uid",
@@ -70,7 +90,6 @@
     }
   },
   "#NOTE_DATA": {
-    "API-url": "{EPITECH}/user/{LOGIN}/notes/?format=json",
     "User": {
       "Note": [
         "modules",
@@ -89,7 +108,6 @@
     }
   },
   "#NETSOUL_DATA": {
-    "API-url": "{EPITECH}/user/{LOGIN}/netsoul/?format=json",
     "User": {
       "Netsoul": [
         "",
@@ -105,7 +123,6 @@
     }
   },
   "#FLAGS_DATA": {
-    "API-url": "{EPITECH}/user/{LOGIN}/flags/?format=json",
     "User": {
       "Flags": {
         "Medal": {
@@ -148,7 +165,6 @@
     }
   },
   "#BINOMES_DATA": {
-    "API-url": "{EPITECH}/user/{LOGIN}/binome/?format=json",
     "User": {
       "Pairs": [
         "binomes",
@@ -162,7 +178,6 @@
     }
   },
   "#MISSED_DATA": {
-    "API-url": "{EPITECH}/user/notification/missed/?format=json",
     "User": {
       "Abscence": {
         "Recents": [
@@ -185,7 +200,6 @@
     }
   },
   "#DOCUMENT_DATA": {
-    "API-url": "{EPITECH}/user/{LOGIN}}/document/?format=json",
     "User": {
       "Documents": [
         "",

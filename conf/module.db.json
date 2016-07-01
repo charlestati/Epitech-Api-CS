@@ -1,0 +1,73 @@
+{
+  "API-local-config": {
+    "API-dbName": "MODULE.DB",
+    "API-modules": [
+      {
+        "Name": "MODULES",
+        "Url": "{EPITECH}/course/filter?format=json&([location[]={LOCATION}])&([course[]={COURSE}])&([scolaryear[]={YEAR}])"
+      },
+      {
+        "Name": "ACTIVITIES",
+        "Url": "{EPITECH}/module/board/?format=json&start={ACTI_START}&end={ACTI_END}"
+      }
+    ]
+  },
+  "#MODULES": {
+    "Modules": {
+      "Module": [
+        "",
+        {
+          "Name": "title",
+          "Code": "code",
+          "Instance": "codeinstance",
+          "Semester": "semester",
+          "Year": "scolaryear",
+          "CurrentPromo": "active_promo",
+          "Location": {
+            "Name": "location_title",
+            "Core": "instance_location"
+          },
+          "Status": "status",
+          "Credits": "credits",
+          "Date": {
+            "Start": "begin",
+            "End": "end",
+            "Register": "end_register"
+          }
+        }
+      ]
+    }
+  },
+  "#ACTIVITIES": {
+    "Modules": {
+      "Activities": [
+        "",
+        {
+          "Year": "scolaryear",
+          "Instance": "codeinstance",
+          "Location": "codelocation",
+          "Module": {
+            "Name": "title_module",
+            "Code": "codemodule"
+          },
+          "Event": {
+            "Start": "begin_event",
+            "End": "end_event"
+          },
+          "Activity": {
+            "Name": "acti_title",
+            "Code": "codeacti",
+            "Type": {
+              "Name": "type_acti",
+              "Code": "type_acti_code"
+            },
+            "Project": "project",
+            "Start": "begin_acti",
+            "End": "end_acti",
+            "Registered": "registered"
+          }
+        }
+      ]
+    }
+  }
+}

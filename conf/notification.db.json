@@ -2,12 +2,17 @@
   "API-local-config": {
     "API-dbName": "NOTIFICATION.DB",
     "API-modules": [
-      "MESSAGE",
-      "ALERT"
+      {
+        "Name": "MESSAGE",
+        "Url": "{EPITECH}/user/notification/message/?format=json"
+      },
+      {
+        "Name": "ALERT",
+        "Url": "{EPITECH}/user/notification/alert/?format=json"
+      }
     ]
   },
   "#MESSAGE": {
-    "API-url": "{EPITECH}/user/notification/message/?format=json",
     "Notification": {
       "Message": [
         "",
@@ -25,7 +30,6 @@
     }
   },
   "#ALERT": {
-    "API-url": "{EPITECH}/user/notification/alert/?format=json",
     "Notification": {
       "Alert": [
         "",
