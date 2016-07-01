@@ -4,6 +4,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pheonyx.EpitechAPI", "Pheonyx.EpitechAPI\Pheonyx.EpitechAPI.csproj", "{3BEAFC0D-8F2D-4988-ACB8-06DE1F8AFA00}"
+	ProjectSection(ProjectDependencies) = postProject
+		{959F7F85-C98B-4876-971A-9036224578E4} = {959F7F85-C98B-4876-971A-9036224578E4}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Newtonsoft.Json.Portable40", "Newtonsoft.Json\Newtonsoft.Json.Portable40.csproj", "{959F7F85-C98B-4876-971A-9036224578E4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pheonyx.EpitechAPI.ConsoleTest", "Pheonyx.EpitechAPI.ConsoleTest\Pheonyx.EpitechAPI.ConsoleTest.csproj", "{A1812E00-65D6-49A3-ACCF-0CBA599A683C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +22,14 @@ Global
 		{3BEAFC0D-8F2D-4988-ACB8-06DE1F8AFA00}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3BEAFC0D-8F2D-4988-ACB8-06DE1F8AFA00}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3BEAFC0D-8F2D-4988-ACB8-06DE1F8AFA00}.Release|Any CPU.Build.0 = Release|Any CPU
+		{959F7F85-C98B-4876-971A-9036224578E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{959F7F85-C98B-4876-971A-9036224578E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{959F7F85-C98B-4876-971A-9036224578E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{959F7F85-C98B-4876-971A-9036224578E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1812E00-65D6-49A3-ACCF-0CBA599A683C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1812E00-65D6-49A3-ACCF-0CBA599A683C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1812E00-65D6-49A3-ACCF-0CBA599A683C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1812E00-65D6-49A3-ACCF-0CBA599A683C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
