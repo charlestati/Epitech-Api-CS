@@ -22,22 +22,26 @@ namespace Pheonyx.EpitechAPI.ConsoleTest
             Console.WriteLine("-----------");
             Console.WriteLine(jsonData["Test"] == null);
             Console.WriteLine("-----------");
-            Console.WriteLine(Utility.JsonTools.setVariable(jsonData["API-local-config"]["API-modules"][0]["Url"], new Dictionary<string, string>()
+            Console.WriteLine(Utility.Json.setVar(jsonData["API-local-config"]["API-modules"][0]["Url"], new Dictionary<string, string>()
             {
                 { "EPITECH", "https://intra.epitech.eu" },
                 { "START", "2016-01-01" },
                 { "END", "2016-02-01" },
-            }
-            ));
-            Console.WriteLine(Utility.JsonTools.accessPath("API-local-config.API-modules.0.Url", jsonData));
-            Console.WriteLine(Utility.JsonTools.setVariable(Utility.JsonTools.accessPath("API-local-config.API-modules.0.Url", jsonData), new Dictionary<string, string>()
+            }));
+            Console.WriteLine(Utility.Json.accessTo("API-local-config.API-modules.0.Url", jsonData));
+            Console.WriteLine(Utility.Json.setVar(Utility.Json.accessTo("API-local-config.API-modules.0.Url", jsonData), new Dictionary<string, string>()
             {
                 { "EPITECH", "https://intra.epitech.eu" },
                 { "START", "2016-01-01" },
                 { "END", "2016-02-01" },
-            }
-              ));
-            Console.WriteLine(Utility.JsonTools.findRow("gpa[cycle=bachelor].gpa", jsonUser));
+            }));
+            Console.WriteLine(Utility.Json.accessRow("gpa[cycle=bachelor].gpa", jsonUser));
+            Utility.Json.appendItems("API-local-config.API-modules.0.Url+  #PLANNING.Planning.1.Module", jsonData);
+            Utility.Json.multiSetVar(new JValue("{EPITECH}/course/filter?format=json([&location[]={LOCATION}{YEAR}])([&course[]={COURSE}])([&scolaryear[]={YEAR}])"), new Dictionary<string, List<string>>()
+            {
+                { "LOCATION", new List<string>() { "TLS", "PAR" } },
+                { "YEAR", new List<string>() { "2014", "2015" } },
+            });
             Console.ReadKey();
         }
     }
