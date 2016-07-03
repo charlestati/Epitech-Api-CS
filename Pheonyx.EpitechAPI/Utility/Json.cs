@@ -1,19 +1,32 @@
 ﻿using Newtonsoft.Json.Linq;
+using Pheonyx.EpitechAPI.Extension;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace Pheonyx.EpitechAPI.Utility.Json
+namespace Pheonyx.EpitechAPI.Utils.Json
 {
     static public class APIConfigLoader
     {
-        static public JValue setVar(JToken jValue, Dictionary<string, string> dVar)
+        static public JValue setVar(JToken jValue, Dictionary<String, Object> dVar)
         {
             if (jValue == null) throw new System.ArgumentNullException("jValue");
             if (dVar == null) throw new System.ArgumentNullException("dVar");
             if (!(jValue is JValue)) throw new System.ArgumentException("Invalid type (must be JValue)", "jValue");
             if (dVar.Count == 0) return (jValue.Value<JValue>());
+
+            jValue = multiSetVar(jValue.Value<JValue>(), dVar
+                .Where(d => d.Value is List<String>)
+                .ToDictionary(d => d.Key, d => d.Value as List<String>));
+            return (singleSetVar(jValue.Value<JValue>(), dVar
+                .Where(dict => dict.Value is String)
+                .ToDictionary(d => d.Key, d => d.Value as String)));
+        }
+
+        static private JValue singleSetVar(JValue jValue, Dictionary<String, String> dVar)
+        {
+            if (dVar.Count == 0) return (jValue);
 
             string sValue = jValue.ToString();
             foreach (var pVal in dVar)
@@ -21,28 +34,24 @@ namespace Pheonyx.EpitechAPI.Utility.Json
             return (new JValue(sValue));
         }
 
-        static public JValue multiSetVar(JToken jValue, Dictionary<string, List<string>> dVar)
+        static private JValue multiSetVar(JValue jValue, Dictionary<String, List<String>> dVar)
         {
-            if (jValue == null) throw new System.ArgumentNullException("jValue");
-            //if (dVar == null) throw new System.ArgumentNullException("dVar");
-            if (!(jValue is JValue)) throw new System.ArgumentException("Invalid type (must be JValue)", "jValue");
-            //if (dVar.Count == 0) return (jValue.Value<JValue>());
+            if (dVar.Count == 0) return (jValue);
 
-            string sValue = jValue.ToString();
             Regex rEngine = new Regex(@"(.+?)\(\[(.+?)\]\)(.*)");
+            string sValue = jValue.ToString();
             Match mMatch;
             while ((mMatch = rEngine.Match(sValue)).Success)
             {
                 if (mMatch.Groups.Count != 4)
                     continue;
-                string sTemporary = mMatch.Groups[1].Value;
+                sValue = mMatch.Groups[1].Value;
                 string sArea = mMatch.Groups[2].Value;
                 foreach (var pKey in dVar)
                     if (sArea.Contains("{" + pKey.Key + "}"))
                         foreach (var sReplace in pKey.Value)
-                            sTemporary += sArea.Replace("{" + pKey.Key + "}", sReplace);
-                sTemporary += mMatch.Groups[3].Value;
-                sValue = sTemporary;
+                            sValue += sArea.Replace("{" + pKey.Key + "}", sReplace);
+                sValue += mMatch.Groups[3].Value;
             }
             return (new JValue(sValue));
         }
@@ -52,33 +61,30 @@ namespace Pheonyx.EpitechAPI.Utility.Json
     {
         static public JToken accessTo(JToken jValue, JToken jRoot)
         {
-            if (jValue == null) throw new System.ArgumentNullException("jValue");
-            if (jRoot == null) throw new System.ArgumentNullException("jRoot");
+            if (jValue == null) return (null);
             if (!(jValue is JValue)) throw new System.ArgumentException("Incorrect type (must be JValue)", "jValue");
+            if (jRoot == null) throw new System.ArgumentNullException("jRoot");
 
-            Dictionary<Func<String, Boolean>, Func<JToken, JToken, JToken>> accessConditions = new Dictionary<Func<string, bool>, Func<JToken, JToken, JToken>>()
+            Dictionary<Func<String, Boolean>, Func<String, JToken, JToken>> accessConditions = new Dictionary<Func<String, Boolean>, Func<String, JToken, JToken>>()
             {
-                { (string sValue) => { return (sValue.Contains("(+)")); }, appendItems },
-                { (string sValue) => { return (Regex.IsMatch(sValue, @"[\w.]+?\[[\w.]+=\w+\].+")); }, accessRow },
-                { (string sValue) => { return (true); }, accessPath }
+                { (String _sValue) => { return (_sValue.Contains("(+)")); }, appendItems },
+                { (String _sValue) => { return (Regex.IsMatch(_sValue, @"^\((.+?)\|(.+?)\)$")); }, splitItem },
+                { (String _sValue) => { return (Regex.IsMatch(_sValue, @"[\w.]+?\[[\w.]+=\w+\].+")); }, accessRow },
+                { (String _sValue) => { return (!_sValue.Contains('[', ']', '(', ')', ' ', '\t', '\n')); }, accessPath }
             };
 
+            string sValue = jValue.ToString().Trim(' ');
             var access = accessConditions
-                .Where(condition => condition.Key(jValue.ToString()))
-                .Select(func => func.Value)
-                .First();
-            if (access == null)
+                .Where(condition => condition.Key(sValue))
+                .Select(func => func.Value);
+            if (access.Count() == 0)
                 throw new Exception("Invalid access argument");
-            return (access(jValue, jRoot));
+            return (access.First()(sValue, jRoot));
         }
 
-        static public JToken accessPath(JToken jPath, JToken jRoot)
+        static private JToken accessPath(String sPath, JToken jRoot)
         {
-            if (jPath == null) throw new System.ArgumentNullException("sPath");
-            if (jRoot == null) throw new System.ArgumentNullException("jRoot");
-            if (!(jPath is JValue)) throw new System.ArgumentException("Incorrect type (must be JValue)", "jValue");
-
-            string sPath = jPath.ToString().TrimStart('.');
+            sPath = sPath.TrimStart('.');
             foreach (var sNode in sPath.Split(new char[] { '.' }))
                 switch (jRoot.Type)
                 {
@@ -91,7 +97,7 @@ namespace Pheonyx.EpitechAPI.Utility.Json
                         int iNode;
 
                         if (!int.TryParse(sNode, out iNode))
-                            throw new System.ArgumentException(string.Format("'{0}' in '{1}' must be an Int32", sNode, sPath));
+                            throw new System.ArgumentException(String.Format("'{0}' in '{1}' must be an Int32", sNode, sPath));
                         try { jRoot = jRoot[iNode]; }
                         catch { throw new System.IndexOutOfRangeException(); }
                         break;
@@ -102,22 +108,19 @@ namespace Pheonyx.EpitechAPI.Utility.Json
             return (jRoot);
         }
 
-        static public JToken accessRow(JToken jValue, JToken jRoot)
+        static private JToken accessRow(String sValue, JToken jRoot)
         {
-            if (jValue == null) throw new System.ArgumentNullException("jValue");
-            if (jRoot == null) throw new System.ArgumentNullException("jRoot");
-            if (!(jValue is JValue)) throw new System.ArgumentException("Incorrect type (must be JValue)", "jValue");
-
-            Match matchFinder = Regex.Match(jValue.ToString(), @"([\w.]+?)\[([\w.]+)=(\w+)\](.+)");
-            if (!matchFinder.Success || matchFinder.Groups.Count != 5)
+            Match matchRow = Regex.Match(sValue, @"([\w.]+?)\[([\w.]+)=(\w+)\](.+)");
+            if (!matchRow.Success || matchRow.Groups.Count != 5)
                 throw new System.ArgumentException();
-            JToken jQuery = accessTo(matchFinder.Groups[1].Value, jRoot);
+
+            JToken jQuery = accessTo(matchRow.Groups[1].Value, jRoot);
             if (!(jQuery is JArray))
                 return (null);
 
             JToken jRow = null;
-            string sPath = matchFinder.Groups[2].Value;
-            string sComparator = matchFinder.Groups[3].Value;
+            string sPath = matchRow.Groups[2].Value;
+            string sComparator = matchRow.Groups[3].Value;
             foreach (JToken jContent in jQuery)
             {
                 JValue tValue = accessTo(sPath, jContent) as JValue;
@@ -130,18 +133,30 @@ namespace Pheonyx.EpitechAPI.Utility.Json
             }
             if (jRow == null)
                 return (null);
-            return (accessTo(matchFinder.Groups[4].Value, jRow));
+            return (accessTo(matchRow.Groups[4].Value, jRow));
         }
 
-        static public JArray appendItems(JToken jValue, JToken jRoot)
+        static private JArray splitItem(String sValue, JToken jRoot)
         {
-            if (jValue == null) throw new System.ArgumentNullException("jValue");
-            if (jRoot == null) throw new System.ArgumentNullException("jRoot");
-            if (!(jValue is JValue)) throw new System.ArgumentException("Incorrect type (must be JValue)", "jValue");
+            Match matchSplit = Regex.Match(sValue, @"^\((.+?)\|(.+?)\)$");
+            if (!matchSplit.Success || matchSplit.Groups.Count != 3)
+                throw new System.ArgumentException();
 
-            string sValue = jValue.ToString();
-            string[] sItems = { sValue.Substring(0, sValue.IndexOf("(+)")).Trim(' '), sValue.Substring(sValue.IndexOf("(+)") + 3).Trim(' ') };
-            JToken[] jItems = { accessTo(new JValue(sItems[0]), jRoot), accessTo(new JValue(sItems[0]), jRoot) };
+            JToken jItem = accessTo(matchSplit.Groups[1].Value, jRoot);
+            char[] cDelimiters = matchSplit.Groups[2].Value.ToCharArray();
+            if (!(jItem is JValue))
+                throw new System.ArgumentException("Incorrect type (must be JValue)", "jPath");
+
+            JArray jItems = new JArray();
+            foreach (string sItem in jItem.ToString().Trim(' ').Split(cDelimiters))
+                jItems.Add(new JValue(sItem));
+            return (jItems);
+        }
+
+        static private JArray appendItems(String sValue, JToken jRoot)
+        {
+            string[] sItems = { sValue.Substring(0, sValue.IndexOf("(+)")), sValue.Substring(sValue.IndexOf("(+)") + 3) };
+            JToken[] jItems = { accessTo(new JValue(sItems[0]), jRoot), accessTo(new JValue(sItems[1]), jRoot) };
             JArray jArray = new JArray();
 
             foreach (var jItem in jItems)
