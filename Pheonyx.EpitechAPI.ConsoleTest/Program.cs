@@ -22,22 +22,22 @@ namespace Pheonyx.EpitechAPI.ConsoleTest
             Console.WriteLine("-----------");
             Console.WriteLine(jsonData["Test"] == null);
             Console.WriteLine("-----------");
-            Console.WriteLine(Utility.Json.setVar(jsonData["API-local-config"]["API-modules"][0]["Url"], new Dictionary<string, string>()
+            Console.WriteLine(Utility.Json.APIConfigLoader.setVar(jsonData["API-local-config"]["API-modules"][0]["Url"], new Dictionary<string, string>()
             {
                 { "EPITECH", "https://intra.epitech.eu" },
                 { "START", "2016-01-01" },
                 { "END", "2016-02-01" },
             }));
-            Console.WriteLine(Utility.Json.accessTo("API-local-config.API-modules.0.Url", jsonData));
-            Console.WriteLine(Utility.Json.setVar(Utility.Json.accessTo("API-local-config.API-modules.0.Url", jsonData), new Dictionary<string, string>()
+            Console.WriteLine(Utility.Json.APIDataLoader.accessTo("API-local-config.API-modules.0.Url", jsonData));
+            Console.WriteLine(Utility.Json.APIConfigLoader.setVar(Utility.Json.APIDataLoader.accessTo("API-local-config.API-modules.0.Url", jsonData), new Dictionary<string, string>()
             {
                 { "EPITECH", "https://intra.epitech.eu" },
                 { "START", "2016-01-01" },
                 { "END", "2016-02-01" },
             }));
-            Console.WriteLine(Utility.Json.accessRow("gpa[cycle=bachelor].gpa", jsonUser));
-            Utility.Json.appendItems("API-local-config.API-modules.0.Url+  #PLANNING.Planning.1.Module", jsonData);
-            Utility.Json.multiSetVar(new JValue("{EPITECH}/course/filter?format=json([&location[]={LOCATION}{YEAR}])([&course[]={COURSE}])([&scolaryear[]={YEAR}])"), new Dictionary<string, List<string>>()
+            Console.WriteLine(Utility.Json.APIDataLoader.accessTo("gpa[cycle=bachelor].gpa", jsonUser));
+            Utility.Json.APIDataLoader.accessTo("API-local-config.API-modules.0.Url+  #PLANNING.Planning.1.Module", jsonData);
+            Utility.Json.APIConfigLoader.multiSetVar(new JValue("{EPITECH}/course/filter?format=json([&location[]={LOCATION}{YEAR}])([&course[]={COURSE}])([&scolaryear[]={YEAR}])"), new Dictionary<string, List<string>>()
             {
                 { "LOCATION", new List<string>() { "TLS", "PAR" } },
                 { "YEAR", new List<string>() { "2014", "2015" } },

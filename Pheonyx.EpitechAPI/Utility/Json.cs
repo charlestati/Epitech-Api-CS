@@ -1,11 +1,12 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace Pheonyx.EpitechAPI.Utility
+namespace Pheonyx.EpitechAPI.Utility.Json
 {
-    static public class Json
+    static public class APIConfigLoader
     {
         static public JValue setVar(JToken jValue, Dictionary<string, string> dVar)
         {
@@ -45,13 +46,39 @@ namespace Pheonyx.EpitechAPI.Utility
             }
             return (new JValue(sValue));
         }
+    }
 
-        static public JToken accessTo(string sPath, JToken jRoot)
+    static public class APIDataLoader
+    {
+        static public JToken accessTo(JToken jValue, JToken jRoot)
         {
-            if (sPath == null) throw new System.ArgumentNullException("sPath");
+            if (jValue == null) throw new System.ArgumentNullException("jValue");
             if (jRoot == null) throw new System.ArgumentNullException("jRoot");
+            if (!(jValue is JValue)) throw new System.ArgumentException("Incorrect type (must be JValue)", "jValue");
 
-            sPath = sPath.TrimStart('.');
+            Dictionary<Func<String, Boolean>, Func<JToken, JToken, JToken>> accessConditions = new Dictionary<Func<string, bool>, Func<JToken, JToken, JToken>>()
+            {
+                { (string sValue) => { return (sValue.Contains("(+)")); }, appendItems },
+                { (string sValue) => { return (Regex.IsMatch(sValue, @"[\w.]+?\[[\w.]+=\w+\].+")); }, accessRow },
+                { (string sValue) => { return (true); }, accessPath }
+            };
+
+            var access = accessConditions
+                .Where(condition => condition.Key(jValue.ToString()))
+                .Select(func => func.Value)
+                .First();
+            if (access == null)
+                throw new Exception("Invalid access argument");
+            return (access(jValue, jRoot));
+        }
+
+        static public JToken accessPath(JToken jPath, JToken jRoot)
+        {
+            if (jPath == null) throw new System.ArgumentNullException("sPath");
+            if (jRoot == null) throw new System.ArgumentNullException("jRoot");
+            if (!(jPath is JValue)) throw new System.ArgumentException("Incorrect type (must be JValue)", "jValue");
+
+            string sPath = jPath.ToString().TrimStart('.');
             foreach (var sNode in sPath.Split(new char[] { '.' }))
                 switch (jRoot.Type)
                 {
@@ -113,9 +140,20 @@ namespace Pheonyx.EpitechAPI.Utility
             if (!(jValue is JValue)) throw new System.ArgumentException("Incorrect type (must be JValue)", "jValue");
 
             string sValue = jValue.ToString();
-            string[] sItems = { sValue.Substring(0, sValue.IndexOf('+')).Trim(' '), sValue.Substring(sValue.IndexOf('+') + 1).Trim(' ') };
-            //TODO: A faire près le ToolManager
-            return (null);
+            string[] sItems = { sValue.Substring(0, sValue.IndexOf("(+)")).Trim(' '), sValue.Substring(sValue.IndexOf("(+)") + 3).Trim(' ') };
+            JToken[] jItems = { accessTo(new JValue(sItems[0]), jRoot), accessTo(new JValue(sItems[0]), jRoot) };
+            JArray jArray = new JArray();
+
+            foreach (var jItem in jItems)
+            {
+                if (jItem is JArray)
+                    jArray.Merge(jItem);
+                else if (jItem is JValue)
+                    jArray.Add(jItem);
+                else
+                    throw new Exception("Incorrect Type");
+            }
+            return (jArray);
         }
     }
 }
