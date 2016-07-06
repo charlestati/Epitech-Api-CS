@@ -129,9 +129,9 @@ namespace Pheonyx.EpitechAPI
         }
         public bool ConnectToAPI(ConnectionManager manager, String uri, String user, String password)
         {
-            uri.ThrowIfNull(nameof(uri));
-            user.ThrowIfNull(nameof(user));
-            password.ThrowIfNull(nameof(password));
+            uri.ArgumentNotNull(nameof(uri));
+            user.ArgumentNotNull(nameof(user));
+            password.ArgumentNotNull(nameof(password));
 
             cookies = new CookieContainer();
             switch (manager)
@@ -144,6 +144,5 @@ namespace Pheonyx.EpitechAPI
                     return (false);
             }
         }
-
     }
 }
