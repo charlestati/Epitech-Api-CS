@@ -13,202 +13,149 @@ namespace Pheonyx.EpitechAPI
         DBNull,
         Structure,
         Array,
-        Int64,
-        Double,
+        Char,
         String,
-        DateTime,
-        Boolean
+        Boolean,
+        Integral,
+        Decimal,
+        Floating,
+        Date
     }
 
-    public class EQuery : IDictionary<Object, EQuery>
+    abstract public class EQuery : ICollection
     {
-        private Dictionary<string, EQuery> itemContainer;
-        private bool readOnly = false;
+        protected QueryLock _lockManager = null;
+        protected ICollection _itemCollection = null;
+        protected EQueryType _type = EQueryType.DBNull;
+        protected bool _isLocked = false;
 
-        #region Constructor
-        public EQuery()
+        #region Lock Manager
+        public sealed class QueryLock
         {
-            itemContainer = new Dictionary<string, EQuery>();
-        }
-        protected EQuery(Dictionary<string, EQuery> itemContainer = null)
-        {
-            this.itemContainer = itemContainer;
+            private EQuery _query = null;
+
+            ~QueryLock()
+            {
+                QueryInstance = null;
+            }
+
+            public EQuery QueryInstance
+            {
+                set
+                {
+                    if (value == null)
+                        return;
+                    value.LockManager = this;
+                    _query = value;
+                }
+            }
+            public void Unlock()
+            {
+                UnlockQuery(_query);
+            }
+            public void Lock()
+            {
+               LockQuery(_query);
+            }
         }
         #endregion
 
-        #region Interface Implementation
-        public EQuery this[Object key]
+        protected EQuery(EQueryType queryType)
+        {
+            _type = queryType;
+        }
+        private EQuery() { throw new System.NotImplementedException(); }
+
+        abstract public EQuery this[Object key]
+        {
+            get;
+            set;
+        }
+        public EQueryType Type
         {
             get
             {
-                key.ArgumentNotNull(nameof(key));
-                key.ArgumentValidType(typeof(String), nameof(key));
-                return AccessTo(key as string);
+                return _type;
             }
-
+        }
+        internal QueryLock LockManager
+        {
             set
             {
-                key.ArgumentNotNull(nameof(key));
-                key.ArgumentValidType(typeof(String), nameof(key));
-
-                if (readOnly)
-                    throw new InvalidOperationException("This Query instance is read only.");
-                if (itemContainer.ContainsKey(key as string))
-                    itemContainer[key as string] = value;
-                else
-                    itemContainer.Add(key as string, value);
+                if (_lockManager == value)
+                    return;
+                if (_lockManager != null)
+                    throw new InvalidOperationException("An AEQuery instance can only use one QueryLock.");
+                _lockManager = value;
+                foreach (EQuery query in Childs())
+                    query.LockManager = value;
             }
         }
+        abstract protected ICollection<EQuery> Childs();
 
-        public int Count
+
+        #region ICollection Interface
+        #region Properties
+        virtual public int Count
         {
             get
             {
-                return itemContainer.Count;
+                return _itemCollection.Count;
             }
         }
-
-        public bool IsReadOnly
+        public bool IsSynchronized
         {
             get
             {
-                return readOnly;
+                return false;
             }
         }
-
-        public ICollection<Object> Keys
+        public object SyncRoot
         {
             get
             {
-                return itemContainer.Select(kv => kv.Key as object).ToList();
+                throw null;
             }
         }
-
-        public ICollection<EQuery> Values
-        {
-            get
-            {
-                return itemContainer.Select(kv => kv.Value).ToList();
-            }
-        }
-
-        public void Add(KeyValuePair<Object, EQuery> item)
-        {
-            item.ArgumentNotNull(nameof(item));
-            item.ArgumentValidType(typeof(KeyValuePair<String, EQuery>), nameof(item));
-            item.Key.ArgumentNotNull(nameof(item.Key));
-            item.Value.ArgumentNotNull(nameof(item.Value));
-
-            if (readOnly)
-                throw new InvalidOperationException("This Query instance is read only.");
-            itemContainer.Add(item.Key as string, item.Value);
-        }
-
-        public void Add(Object key, EQuery value)
-        {
-            key.ArgumentNotNull(nameof(key));
-            key.ArgumentValidType(typeof(String), nameof(key));
-            value.ArgumentNotNull(nameof(value));
-
-            if (readOnly)
-                throw new InvalidOperationException("This Query instance is read only.");
-            itemContainer.Add(key as string, value);
-        }
-
-        public void Clear()
-        {
-            if (readOnly)
-                throw new InvalidOperationException("This Query instance is read only.");
-            itemContainer.Clear();
-        }
-
-        public bool Contains(KeyValuePair<Object, EQuery> item)
-        {
-            item.ArgumentValidType(typeof(KeyValuePair<String, EQuery>), nameof(item));
-            item.Key.ArgumentNotNull(nameof(item.Key));
-            item.Value.ArgumentNotNull(nameof(item.Value));
-
-            return itemContainer.Contains(new KeyValuePair<string, EQuery>(item.Key as string, item.Value));
-        }
-
-        public bool ContainsKey(Object key)
-        {
-            key.ArgumentNotNull(nameof(key));
-            key.ArgumentValidType(typeof(String), nameof(key));
-
-            return itemContainer.ContainsKey(key as string);
-        }
-
-        public void CopyTo(KeyValuePair<Object, EQuery>[] array, int arrayIndex)
-        {
-            array.ArgumentNotNull(nameof(array));
-            array.ArgumentValidType(typeof(KeyValuePair<String, EQuery>[]), nameof(array));
-            arrayIndex.ArgumentValidType(typeof(Int32), nameof(arrayIndex));
-
-            if (arrayIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(arrayIndex));
-            if (array.Count() - arrayIndex < this.Count())
-                throw new ArgumentException("The index is equal to or greater than the length of the array, or the number of elements in the dictionary is greater than the available space from index to the end.", nameof(arrayIndex));
-
-            foreach (var pItem in itemContainer)
-                array[arrayIndex++] = new KeyValuePair<Object, EQuery>(pItem.Key, pItem.Value);
-        }
-
-        public IEnumerator<KeyValuePair<Object, EQuery>> GetEnumerator()
-        {
-            return itemContainer.Cast<KeyValuePair<Object, EQuery>>().GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }
-
-        public bool Remove(KeyValuePair<Object, EQuery> item)
-        {
-            item.ArgumentValidType(typeof(KeyValuePair<String, EQuery>), nameof(item));
-            item.Key.ArgumentNotNull(nameof(item.Key));
-
-            if (readOnly)
-                throw new InvalidOperationException("This Query instance is read only.");
-            return itemContainer.Remove(item.Key as string);
-        }
-
-        public bool Remove(Object key)
-        {
-            key.ArgumentNotNull(nameof(key));
-            key.ArgumentValidType(typeof(String), nameof(key));
-
-            if (readOnly)
-                throw new InvalidOperationException("This Query instance is read only.");
-            return itemContainer.Remove(key as string);
-        }
-
-        public bool TryGetValue(Object key, out EQuery value)
-        {
-            key.ArgumentNotNull(nameof(key));
-            key.ArgumentValidType(typeof(String), nameof(key));
-
-            return itemContainer.TryGetValue(key as String, out value);
-        }
-
         #endregion
 
-        public bool LockQuery()
-        {
-            if (readOnly)
-                throw new InvalidOperationException("This Query instance is already read only.");
-            readOnly = true;
-            return IsReadOnly;
-        }
+        #region Abstract ICollection
+        abstract public void CopyTo(Array array, int index);
+        abstract public IEnumerator GetEnumerator();
+        #endregion
+        #endregion
 
-        public EQuery AccessTo(EPath path)
+        #region Lock Queries
+        public bool IsLocked
         {
-            if (!path.MoveNext())
-                return this;
-            if (path.CurrentPath == null || !itemContainer.ContainsKey(path.CurrentPath))
-                return (null); //Create ENull
-            return (itemContainer[path.CurrentPath].AccessTo(path));
+            get
+            {
+                return _isLocked;
+            }
         }
+        protected void IsUnlocked()
+        {
+            if (_isLocked)
+                throw new InvalidOperationException(String.Format("This {0} instance is read only.", _type));
+        }
+        static protected bool LockQuery(EQuery self)
+        {
+            if (self._isLocked)
+                throw new InvalidOperationException(String.Format("This {0} instance is already read only.", self._type));
+            foreach (EQuery query in self.Childs())
+                LockQuery(query);
+            self._isLocked = true;
+            return self.IsLocked;
+        }
+        static protected bool UnlockQuery(EQuery self)
+        {
+            foreach (EQuery query in self.Childs())
+                UnlockQuery(query);
+            self._isLocked = false;
+            return !self.IsLocked;
+        }
+        #endregion
+
+        abstract public EQuery AccessTo(EPath ePath);
     }
 }

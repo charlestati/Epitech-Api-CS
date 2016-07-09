@@ -63,6 +63,17 @@ namespace Pheonyx.EpitechAPI
                 return pathArray[currentPath];
             }
         }
+        public Int32? CurrentRow
+        {
+            get
+            {
+                int row;
+
+                if (Int32.TryParse(CurrentPath, out row))
+                    return row;
+                return null;
+            }
+        }
 
         public bool MoveNext()
         {
@@ -103,6 +114,5 @@ namespace Pheonyx.EpitechAPI
         {
             return ePath.ToString();
         }
-
     }
 }

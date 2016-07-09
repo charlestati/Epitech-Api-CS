@@ -35,10 +35,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ApiDB\EArray.cs" />
-    <Compile Include="ApiDB\ENull.cs" />
     <Compile Include="ApiDB\EPath.cs" />
-    <Compile Include="ApiDB\EQuery.cs" />
+    <Compile Include="ApiDB\EObject.cs" />
     <Compile Include="ApiDB\EValue.cs" />
+    <Compile Include="ApiDB\EQuery.cs" />
     <Compile Include="Exception\Utils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\Json.cs" />

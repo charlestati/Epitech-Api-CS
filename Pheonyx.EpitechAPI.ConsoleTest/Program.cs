@@ -1,34 +1,51 @@
 ﻿using System;
 using Newtonsoft.Json.Linq;
 using System.Net;
-using System.Reflection;
-using System.Linq;
 using System.IO;
-using System.Text;
-using System.Collections.Specialized;
 using System.Collections.Generic;
 
-namespace Pheonyx.EpitechAPI.ConsoleTest
+namespace Pheonyx.EpitechAPI
 {
     internal class Program
     {
         private static void Main(string[] args)
         {
-            EQuery eQuery = new EQuery();
-            eQuery["a"] = new EQuery();
-            eQuery["a"]["b"] = new EQuery();
-            eQuery["a"]["b"]["c"] = new EQuery();
-            eQuery["a"]["b"]["c"]["2"] = new EQuery();
+            EObject eQuery = new EObject();
+            eQuery["a"] = new EValue("ok");
+            eQuery["a"] = new EValue(true);
+            eQuery["a"] = new EValue(9);
+            eQuery["a"] = new EValue((UInt16)9.7);
+            eQuery["a"] = new EValue(new DateTime(1996, 02, 28));
+            eQuery["a"] = new EValue(new DateTimeOffset((eQuery["a"] as EValue).Value<DateTime>()));
+            eQuery["a"] = new EValue((Byte)7);
+            eQuery["a"] = new EValue(null);
+
+
+            EQuery.QueryLock lockManager = new EQuery.QueryLock();
+            lockManager.QueryInstance = eQuery;
+            eQuery["a"] = new EObject();
+            eQuery["a"]["b"] = new EObject();
+            eQuery["a"]["b"]["c"] = new EObject();
+            eQuery["a"]["b"]["c"]["2"] = new EObject();
             eQuery.Clear();
 
-            eQuery["a"] = new EQuery();
-            eQuery["a"]["b"] = new EQuery();
-            eQuery["a"]["b"]["c"] = new EQuery();
-            eQuery["a"]["b"]["c"]["2"] = new EQuery();
-            eQuery.LockQuery();
+            eQuery["a"] = new EObject();
+            eQuery["a"]["b"] = new EObject();
+            eQuery["a"]["b"]["c"] = new EObject();
+            eQuery["a"]["b"]["c"]["2"] = new EObject();
+            lockManager.Lock();
 
             try
-            { Console.WriteLine(eQuery.LockQuery()); }
+            { lockManager.Lock(); }
+            catch (Exception e)
+            { Console.WriteLine("{0}: {1}", e.GetType(), e.Message); }
+            EQuery.QueryLock userLock = new EQuery.QueryLock();
+            try
+            { userLock.QueryInstance = eQuery.AccessTo("a.b"); }
+            catch (Exception e)
+            { Console.WriteLine("{0}: {1}", e.GetType(), e.Message); }
+            try
+            { userLock.QueryInstance = eQuery.AccessTo("a.b.c"); }
             catch (Exception e)
             { Console.WriteLine("{0}: {1}", e.GetType(), e.Message); }
             try
@@ -36,7 +53,12 @@ namespace Pheonyx.EpitechAPI.ConsoleTest
             catch (Exception e)
             { Console.WriteLine("{0}: {1}", e.GetType(), e.Message); }
             try
-            { eQuery["b"] = new EValue(); }
+            { (eQuery.AccessTo("a.b.c") as EObject)["Lel"] = new EArray(); }
+            catch (Exception e)
+            { Console.WriteLine("{0}: {1}", e.GetType(), e.Message); }
+            lockManager.Unlock();
+            try
+            { (eQuery.AccessTo("a.b.c") as EObject)["Lel"] = new EArray(); }
             catch (Exception e)
             { Console.WriteLine("{0}: {1}", e.GetType(), e.Message); }
 
@@ -64,6 +86,23 @@ namespace Pheonyx.EpitechAPI.ConsoleTest
             { Console.WriteLine(eQuery.AccessTo("a.[dsqdqs.dqs(fs[ffqsf]sfqf)qsd)f]]qq(q([0].b")); }
             catch (Exception e)
             { Console.WriteLine("{0}: {1}", e.GetType(), e.Message); }
+
+            EQuery eArray = new EArray();
+            lockManager.QueryInstance = eArray;
+            Console.WriteLine(eArray.Count);
+            try
+            { eArray[19] = null; }
+            catch (Exception e)
+            { Console.WriteLine("{0}: {1}", e.GetType(), e.Message); }
+            Console.WriteLine(eArray.Count);
+
+            //var i = eArray[3];
+            //object ok = 2;
+            //i = eArray[ok];
+            //lman.Lock();
+            //eArray[10209302] = null;
+            JValue o = new JValue("ok");
+            JObject a = new JObject();
         }
 
         static void Network(string password)
@@ -75,7 +114,7 @@ namespace Pheonyx.EpitechAPI.ConsoleTest
             string url = Utils.Json.setVar(Utils.Json.accessTo("API-local-config.API-modules[?(@.Name=='BINOMES_DATA')].Url", jsonConfig), new Dictionary<string, object>()
                 {
                     { "EPITECH", "https://intra.epitech.eu" },
-                    { "LOGIN", "duclos_r" }
+                    { "LOGIN", "gascon_n" }
                 }).ToString();
             try
             {

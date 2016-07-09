@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Pheonyx.EpitechAPI.Extension
@@ -42,7 +43,37 @@ namespace Pheonyx.EpitechAPI.Extension
         public static void ArgumentValidType(this Object self, Type type, String nameArgument)
         {
             if (self.GetType() != type)
-                throw new ArgumentException(String.Format("Argument '{0}' has invalid type: {1}. {2} was expected.", nameArgument, self.GetType(), type));
+                throw new ArgumentException(String.Format("Argument '{0}' has invalid type ({1}). {2} was expected.", nameArgument, self.GetType(), type));
         }
     }
+
+    public static class ListExtension
+    {
+        public static void Resize<T>(this List<T> self, int resize, T Tdefault)
+        {
+            int currentSize = self.Count;
+
+            if (currentSize > resize)
+                self.RemoveRange(resize, currentSize - resize);
+            else if (currentSize < resize)
+            {
+                if (resize > self.Capacity)
+                    self.Capacity = resize;
+                self.AddRange(Enumerable.Repeat(Tdefault, resize - currentSize));
+            }
+        }
+        public static void Resize<T>(this List<T> self, int resize)
+        {
+            self.Resize(resize, default(T));
+        }
+    }
+
+    public static class EnumerableExtension
+    {
+        public static bool NotEmpty<T>(this IEnumerable<T> self)
+        {
+            return self.Count() > 0;
+        }
+    }
+
 }
