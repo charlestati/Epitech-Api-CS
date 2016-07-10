@@ -3,6 +3,7 @@ using Pheonyx.EpitechAPI.Extension;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Runtime.ExceptionServices;
 using System.Text;
@@ -16,24 +17,19 @@ namespace Pheonyx.EpitechAPI
     {
         private enum NetworkMethod { GET, POST }
 
-        private String webApiAgent = ".NET Epitech API";
-        private TimeSpan webTimeOut = new TimeSpan(0, 0, 1, 30);
+        private Boolean connected = false;
+        private String webApiAgent;
+        private TimeSpan webTimeOut;
         private CookieContainer cookies;
+        private HttpStatusCode[] ignoreStatusCode = { };
 
         #region Constructor
-        public WebApiClient() { }
-        public WebApiClient(TimeSpan webTimeOut)
-        {
-            this.webTimeOut = webTimeOut;
-        }
-        public WebApiClient(String webApiAgent)
-        {
-            this.webApiAgent = webApiAgent;
-        }
-        public WebApiClient(TimeSpan webTimeOut, String webApiAgent)
+        public WebApiClient(TimeSpan webTimeOut, String webApiAgent, HttpStatusCode[] ignoreStatusCode)
         {
             this.webTimeOut = webTimeOut;
             this.webApiAgent = webApiAgent;
+            if (ignoreStatusCode != null)
+                this.ignoreStatusCode = ignoreStatusCode;
         }
         #endregion
 
@@ -73,11 +69,13 @@ namespace Pheonyx.EpitechAPI
 
                 Task<WebResponse> taskResponse = Task.Factory.FromAsync<WebResponse>(request.BeginGetResponse, request.EndGetResponse, null);
                 taskResponse.Wait(webTimeOut);
-                response = (HttpWebResponse)taskResponse.Result;
+                response = taskResponse.Result as HttpWebResponse;
             }
             catch (Exception e)
             {
-                if (e is AggregateException)
+                if (e.InnerException is WebException && ignoreStatusCode.Contains(((e.InnerException as WebException).Response as HttpWebResponse).StatusCode))
+                    response = (e.InnerException as WebException).Response as HttpWebResponse;
+                else if (e is AggregateException)
                     ExceptionDispatchInfo.Capture(e.InnerException).Throw();
                 else
                     ExceptionDispatchInfo.Capture(e).Throw();
@@ -117,6 +115,13 @@ namespace Pheonyx.EpitechAPI
         }
         #endregion
 
+        public Boolean IsConnected
+        {
+            get
+            {
+                return connected;
+            }
+        }
         public JToken DownloadJson(String uri)
         {
             HttpWebResponse jsonResponse = LoadUri(new Uri(uri), NetworkMethod.GET, null);
@@ -137,12 +142,16 @@ namespace Pheonyx.EpitechAPI
             switch (manager)
             {
                 case ConnectionManager.Office365:
-                    return (ConnectWithOffice(new Uri(uri), user, password));
+                    connected = ConnectWithOffice(new Uri(uri), user, password);
+                    break;
                 case ConnectionManager.Classic:
-                    return (ConnectWithUnix(new Uri(uri), user, password));
+                    connected = ConnectWithUnix(new Uri(uri), user, password);
+                    break;
                 default:
-                    return (false);
+                    connected = false;
+                    break;
             }
+            return connected;
         }
     }
 }

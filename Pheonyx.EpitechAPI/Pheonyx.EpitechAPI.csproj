@@ -39,6 +39,7 @@
     <Compile Include="ApiDB\EObject.cs" />
     <Compile Include="ApiDB\EValue.cs" />
     <Compile Include="ApiDB\EQuery.cs" />
+    <Compile Include="EpitechAPI.cs" />
     <Compile Include="Exception\Utils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\Json.cs" />

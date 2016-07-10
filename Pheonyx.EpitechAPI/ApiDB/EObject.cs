@@ -13,7 +13,7 @@ namespace Pheonyx.EpitechAPI
         private Dictionary<String, EQuery> cInstance;
 
         #region Constructor
-        public EObject() : base(EQueryType.Structure)
+        public EObject() : base(EQueryType.Object)
         {
             _itemCollection = new Dictionary<string, EQuery>();
             cInstance = _itemCollection as Dictionary<String, EQuery>;
@@ -102,6 +102,7 @@ namespace Pheonyx.EpitechAPI
         {
             return cInstance.GetEnumerator();
         }
+
         public void Add(KeyValuePair<String, EQuery> item)
         {
             item.ArgumentNotNull(nameof(item));
@@ -166,7 +167,14 @@ namespace Pheonyx.EpitechAPI
             if (ePath.CurrentPath == null || !ContainsKey(ePath.CurrentPath))
                 return (null); //Todo: Create ENull
             return (this[ePath.CurrentPath].AccessTo(ePath));
-        } 
+        }
         #endregion
+
+        internal void Add(IDictionary<String, EQuery> eQuery)
+        {
+            foreach (var child in eQuery)
+                this.Add(child);
+        }
+
     }
 }

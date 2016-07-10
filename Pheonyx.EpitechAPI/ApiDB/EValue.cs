@@ -1,17 +1,13 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using Pheonyx.EpitechAPI.Extension;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pheonyx.EpitechAPI
 {
     public class EValue : EQuery
     {
         private Object _value = null;
-        private String _errorMessage = "";
 
         #region QueryType Link
         static private Dictionary<EQueryType, List<Type>> QueryLink = new Dictionary<EQueryType, List<System.Type>>()
@@ -30,12 +26,12 @@ namespace Pheonyx.EpitechAPI
         #endregion
 
         #region Constructor
-        public EValue(object value) : base(EQueryType.DBNull)
+        public EValue(object value) : base(EQueryType.Null)
         {
             _itemCollection = null;
             _type = FindType(value);
             //Todo: ENull: Null value or Uknown type TYPE
-            _value = (_type == EQueryType.DBNull) ? null : value;
+            _value = (_type == EQueryType.Null) ? null : value;
         }
         #endregion
 
@@ -74,16 +70,16 @@ namespace Pheonyx.EpitechAPI
         static private EQueryType FindType(object oValue)
         {
             if (oValue == null)
-                return EQueryType.DBNull;
+                return EQueryType.Null;
             foreach (var row in QueryLink)
                 foreach (var type in row.Value)
                     if (type == oValue.GetType())
                         return row.Key;
-            return EQueryType.DBNull;
+            return EQueryType.Null;
         }
         public VType Value<VType>()
         {
-            if (_type == EQueryType.DBNull)
+            if (_type == EQueryType.Null)
                 return default(VType);
             return (VType)Convert.ChangeType(_value, typeof(VType));
         }
@@ -91,10 +87,16 @@ namespace Pheonyx.EpitechAPI
         {
             _type = FindType(value);
             //Todo: ENull: Null value or Uknown type TYPE
-            if (_type == EQueryType.DBNull)
+            if (_type == EQueryType.Null)
                 _value = null;
             else
                 _value = value;
+        }
+        public override String ToString()
+        {
+            if (_value == null)
+                return "NULL";
+            return _value.ToString();
         }
     }
 }

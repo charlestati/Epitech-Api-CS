@@ -10,8 +10,8 @@ namespace Pheonyx.EpitechAPI
 {
     public enum EQueryType
     {
-        DBNull,
-        Structure,
+        Null,
+        Object,
         Array,
         Char,
         String,
@@ -26,7 +26,7 @@ namespace Pheonyx.EpitechAPI
     {
         protected QueryLock _lockManager = null;
         protected ICollection _itemCollection = null;
-        protected EQueryType _type = EQueryType.DBNull;
+        protected EQueryType _type = EQueryType.Null;
         protected bool _isLocked = false;
 
         #region Lock Manager
@@ -78,6 +78,13 @@ namespace Pheonyx.EpitechAPI
                 return _type;
             }
         }
+        public bool IsNull
+        {
+            get
+            {
+                return false;
+            }
+        }
         internal QueryLock LockManager
         {
             set
@@ -91,8 +98,6 @@ namespace Pheonyx.EpitechAPI
                     query.LockManager = value;
             }
         }
-        abstract protected ICollection<EQuery> Childs();
-
 
         #region ICollection Interface
         #region Properties
@@ -156,6 +161,7 @@ namespace Pheonyx.EpitechAPI
         }
         #endregion
 
+        abstract protected ICollection<EQuery> Childs();
         abstract public EQuery AccessTo(EPath ePath);
     }
 }
