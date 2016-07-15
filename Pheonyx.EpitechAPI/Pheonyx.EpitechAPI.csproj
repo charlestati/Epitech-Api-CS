@@ -34,17 +34,17 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="ApiDB\EArray.cs" />
-    <Compile Include="ApiDB\EPath.cs" />
-    <Compile Include="ApiDB\EObject.cs" />
-    <Compile Include="ApiDB\EValue.cs" />
-    <Compile Include="ApiDB\EQuery.cs" />
+    <Compile Include="Database\EArray.cs" />
+    <Compile Include="Database\ENull.cs" />
+    <Compile Include="Database\EPath.cs" />
+    <Compile Include="Database\EObject.cs" />
+    <Compile Include="Database\EValue.cs" />
+    <Compile Include="Database\EQuery.cs" />
     <Compile Include="EpitechAPI.cs" />
-    <Compile Include="Exception\Utils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utils\Json.cs" />
+    <Compile Include="Utils\Tools.cs" />
     <Compile Include="Utils\Extension.cs" />
-    <Compile Include="WebApiClient.cs" />
+    <Compile Include="Utils\WebApiClient.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="project.json" />
