@@ -15,7 +15,7 @@ namespace Pheonyx.EpitechAPI.ConsoleTest
             var sb = new StringBuilder();
             while (true)
             {
-                ConsoleKeyInfo cki = Console.ReadKey(true);
+                var cki = Console.ReadKey(true);
                 if (cki.Key == ConsoleKey.Enter)
                 {
                     Console.WriteLine();
@@ -39,109 +39,125 @@ namespace Pheonyx.EpitechAPI.ConsoleTest
 
             return sb.ToString();
         }
+
         private static void Main(string[] args)
         {
-            var api = new EpitechApi(new[] { HttpStatusCode.InternalServerError });
+            var api = new EpitechApi(new[] {HttpStatusCode.InternalServerError});
 
             #region User COM
-            Console.Write("Login: ");
-            var login = Console.ReadLine();
-            Console.Write("Password: ");
-            var password = GetConsolePassword();
-            #endregion
 
-            var performance = new List<Tuple<String, Int64, Int64>>();
+            //Console.Write("Login: ");
+            //var login = Console.ReadLine();
+            //Console.Write("Password: ");
+            //var password = GetConsolePassword();
+            var login = "";
+            var password = "";
+
+            #endregion User COM
+
+            var performance = new List<Tuple<string, long, long>>();
             var sw = new Stopwatch();
 
             try
             {
-                performance.Add(new Tuple<String, Int64, Int64>("Start", 0, GC.GetTotalMemory(false)));
+                performance.Add(new Tuple<string, long, long>("Start", 0, GC.GetTotalMemory(false)));
 
                 sw.Start();
                 api.ConnectTo(ConnectionManager.Classic, "https://intra.epitech.eu/?format=json", login, password);
                 sw.Stop();
-                performance.Add(new Tuple<String, Int64, Int64>("Connexion", sw.ElapsedMilliseconds, GC.GetTotalMemory(false)));
+                performance.Add(new Tuple<string, long, long>("Connexion", sw.ElapsedMilliseconds,
+                    GC.GetTotalMemory(false)));
 
                 sw.Restart();
                 api.ConfigureApi(new List<string>
                 {
-                    "{'API-local-config':{'API-dbName':'USER.DB','API-modules':[{'Name':'USERS_LIST','Url':'{EPITECH}/user/filter/user?format=json&location={LOCATION}&year={YEAR}&course={COURSE}&promo={PROMO}'}]},'USERS_LIST':{'Users':['items',{'Login':'login'}]}}"
+                    "{'API-local-config':{'API-dbName':'USER.DB','API-modules':[{'Name':'USERS_LIST','Url':'{EPITECH}/user/filter/user?format=json&location={LOCATION}&year={YEAR}&course={COURSE}&promo={PROMO}&count={COUNT}'}]},'USERS_LIST':{'Users':['items',{'Login':'login'}]}}"
                 });
                 sw.Stop();
-                performance.Add(new Tuple<String, Int64, Int64>("Configuration", sw.ElapsedMilliseconds, GC.GetTotalMemory(false)));
+                performance.Add(new Tuple<string, long, long>("Configuration", sw.ElapsedMilliseconds,
+                    GC.GetTotalMemory(false)));
 
                 sw.Restart();
-                api.LoadApi(new Dictionary<string, object>
+                api.LoadData(new Dictionary<string, object>
                 {
-                    { "EPITECH", "https://intra.epitech.eu" },
-                    { "LOGIN", "nicola_s" },
-                    { "LOCATION", "FR/TLS" },
-                    { "COURSE", "bachelor/classic" },
-                    { "YEAR", "2015" },
-                    { "PROMO", "tek2" }
+                    {"EPITECH", "https://intra.epitech.eu"},
+                    {"LOGIN", "nicola_s"},
+                    {"LOCATION", "FR/TLS"},
+                    {"COURSE", "bachelor/classic"},
+                    {"YEAR", "2014|2015|2016"},
+                    {"PROMO", "tek1|tek2|tek3"},
+                    {"COUNT", "1200"}
                 });
                 sw.Stop();
-                performance.Add(new Tuple<String, Int64, Int64>("Load", sw.ElapsedMilliseconds, GC.GetTotalMemory(false)));
-                EQuery e = api.Database;
-                var a = e.ToString();
-
-                api.ClearConfig();
+                performance.Add(new Tuple<string, long, long>("Load", sw.ElapsedMilliseconds, GC.GetTotalMemory(false)));
+                var e = api.Database;
+           
+                api.ClearApi();
                 api.ConfigureApi(new List<string>
                 {
                     "{'API-local-config':{'API-dbName':'USER.DB','API-modules':[{'Name':'USER_DATA','Url':'{EPITECH}/user/{LOGIN}/?format=json'}]},'USER_DATA':{'User':{'Login':'login','UID':'uid','GID':'gid','LastName':'lastname','FirstName':'firstname','Picture':'picture','Promo':'promo','Credits':'credits','GPA':{'Bachelor':'gpa[?(@.cycle==\\'bachelor\\')].gpa','Master':'gpa[?(@.cycle==\\'master\\')].gpa'},'Closed':'close'}}}"
                 });
 
+                var i = 0;
                 foreach (EQuery user in e["Users"])
                 {
-                    api.LoadApi(new Dictionary<string, object>
+                    api.LoadData(new Dictionary<string, object>
                     {
-                        { "EPITECH", "https://intra.epitech.eu" },
-                        { "LOGIN", user["Login"].ToString() },
-                        { "LOCATION", "FR/TLS" },
-                        { "COURSE", "bachelor/classic" },
-                        { "YEAR", "2015" },
-                        { "PROMO", "tek2" }
+                        {"EPITECH", "https://intra.epitech.eu"},
+                        {"LOGIN", ((EValue) user["Login"]).Value<string>()},
+                        {"LOCATION", "FR/TLS"},
+                        {"COURSE", "bachelor/classic"},
+                        {"YEAR", "2015"},
+                        {"PROMO", "tek2"}
                     });
+                    Console.WriteLine($"\n==========> {i++} <==========");
                     Display(api.Database["User"], "");
                 }
                 Display(api.Database, "");
                 Console.WriteLine($"\nDatabase is Locked: {api.Database.IsLocked}");
-                var locker = new EQuery.QueryLock { QueryInstance = api.Database };
-                Console.ReadKey();
+                var locker = new EQuery.QueryLock {QueryInstance = api.Database};
+                //Console.ReadKey();
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                Console.WriteLine("\n>> EXCEPTION <<");
+                Console.WriteLine($"{e.Message}");
+                Console.WriteLine($"{e.StackTrace}");
             }
 
             Console.WriteLine("\nPerformance:");
             foreach (var perf in performance)
                 Performance(perf.Item1, perf.Item2, perf.Item3);
+            Debugger.Break();
             Console.ReadKey();
         }
 
-        static void Performance(String part, Int64 time, Int64 memory)
+        private static void Performance(string part, long time, long memory)
         {
             Console.WriteLine($"\t{part}: ");
             Console.WriteLine($"\t\tExecution Time: {time} ms");
-            Console.WriteLine($"\t\tPrivate Memory: {(Double)(memory / 1000000):0.###} Mo\n");
+            Console.WriteLine($"\t\tPrivate Memory: {(double) (memory/1000000):0.###} Mo\n");
         }
-        static void Display(EQuery eQuery, string tab)
+
+        private static void Display(EQuery eQuery, string tab)
         {
             switch (eQuery.Type)
             {
                 case EQueryType.Object:
-                    Display(eQuery as IDictionary<String, EQuery>, tab);
+                    Display(eQuery as IDictionary<string, EQuery>, tab);
                     break;
+
                 case EQueryType.Array:
                     Display(eQuery as IList<EQuery>, tab);
                     break;
+
                 default:
                     Display(eQuery as EValue, tab);
                     break;
             }
         }
-        static void Display(IDictionary<String, EQuery> eObject, string tab)
+
+        private static void Display(IDictionary<string, EQuery> eObject, string tab)
         {
             foreach (var child in eObject)
             {
@@ -149,7 +165,8 @@ namespace Pheonyx.EpitechAPI.ConsoleTest
                 Display(child.Value, tab + "\t");
             }
         }
-        static void Display(IList<EQuery> eArray, string tab)
+
+        private static void Display(IList<EQuery> eArray, string tab)
         {
             foreach (var child in eArray)
             {
@@ -157,7 +174,8 @@ namespace Pheonyx.EpitechAPI.ConsoleTest
                 Display(child, tab + "\t");
             }
         }
-        static void Display(EValue eValue, string tab)
+
+        private static void Display(EValue eValue, string tab)
         {
             Console.Write("{0}", eValue);
         }

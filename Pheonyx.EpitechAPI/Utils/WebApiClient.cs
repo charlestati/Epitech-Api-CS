@@ -10,38 +10,86 @@ using Newtonsoft.Json.Linq;
 
 namespace Pheonyx.EpitechAPI.Utils
 {
-    public enum ConnectionManager { Office365, Classic }
-
-    public sealed class WebApiClient
+    public enum ConnectionManager
     {
-        private enum NetworkMethod { Get, Post }
+        Office365,
+        Classic
+    }
 
-        private Boolean _connected;
-        private String _webApiAgent;
-        private CookieContainer _cookies;
+    internal sealed class WebApiClient
+    {
+        private readonly HttpStatusCode[] _ignoreStatusCode = {};
         private readonly TimeSpan _webTimeOut;
-        private readonly HttpStatusCode[] _ignoreStatusCode = { };
 
-        public Boolean IsConnected => _connected;
+        private CookieContainer _cookies;
+        private string _webApiAgent;
 
         #region Constructor
-        public WebApiClient(TimeSpan webTimeOut, String webApiAgent, HttpStatusCode[] ignoreStatusCode)
+
+        public WebApiClient(TimeSpan webTimeOut, string webApiAgent, HttpStatusCode[] ignoreStatusCode)
         {
             _webTimeOut = webTimeOut;
             _webApiAgent = webApiAgent;
             if (ignoreStatusCode != null)
                 _ignoreStatusCode = ignoreStatusCode;
         }
-        #endregion
+
+        #endregion Constructor
+
+        public bool IsConnected { get; private set; }
+
+        public JToken DownloadJson(string uri)
+        {
+            var jsonResponse = LoadUri(new Uri(uri), NetworkMethod.Get, null);
+            var jsonContent = "";
+            using (var sResponse = new StreamReader(jsonResponse.GetResponseStream(), Encoding.UTF8))
+            {
+                jsonContent = sResponse.ReadToEnd();
+            }
+            return JToken.Parse(jsonContent);
+        }
+
+        public bool ConnectToApi(ConnectionManager manager, string uri, string user, string password)
+        {
+            uri.ArgumentNotNull(nameof(uri));
+            user.ArgumentNotNull(nameof(user));
+            password.ArgumentNotNull(nameof(password));
+
+            _cookies = new CookieContainer();
+            switch (manager)
+            {
+                case ConnectionManager.Office365:
+                    IsConnected = ConnectWithOffice(new Uri(uri), user, password);
+                    break;
+
+                case ConnectionManager.Classic:
+                    IsConnected = ConnectWithUnix(new Uri(uri), user, password);
+                    break;
+
+                default:
+                    IsConnected = false;
+                    break;
+            }
+            return IsConnected;
+        }
+
+        private enum NetworkMethod
+        {
+            Get,
+            Post
+        }
 
         #region Networks
-        private String GetStringData(Dictionary<String, Object> data)
+
+        private string GetStringData(Dictionary<string, object> data)
         {
-            if (data == null) return String.Empty;
-            var dataString = data.Where(kv => !string.IsNullOrEmpty(kv.Key)).Aggregate("", (current, kv) => current + ("&" + kv.Key + "=" + kv.Value));
+            if (data == null) return string.Empty;
+            var dataString = data.Where(kv => !string.IsNullOrEmpty(kv.Key))
+                .Aggregate("", (current, kv) => current + ("&" + kv.Key + "=" + kv.Value));
             return dataString.TrimStart('&');
         }
-        private HttpWebResponse LoadUri(Uri uri, NetworkMethod method, Dictionary<String, Object> data)
+
+        private HttpWebResponse LoadUri(Uri uri, NetworkMethod method, Dictionary<string, object> data)
         {
             var dataByte = Encoding.UTF8.GetBytes(GetStringData(data));
             var request = WebRequest.CreateHttp(uri);
@@ -55,8 +103,9 @@ namespace Pheonyx.EpitechAPI.Utils
             {
                 if (data != null)
                 {
-                    var taskStream = Task.Factory.FromAsync(request.BeginGetRequestStream, request.EndGetRequestStream, null);
-                    taskStream.Wait(250);
+                    var taskStream = Task.Factory.FromAsync(request.BeginGetRequestStream, request.EndGetRequestStream,
+                        null);
+                    taskStream.Wait(25);
                     using (var requestStream = taskStream.Result)
                     {
                         requestStream.Write(dataByte, 0, dataByte.Length);
@@ -80,68 +129,43 @@ namespace Pheonyx.EpitechAPI.Utils
             GetCookies(response);
             return response;
         }
-        #endregion
+
+        #endregion Networks
 
         #region Cookies Manager
+
         private void SetCookies(WebRequest request)
         {
             if (request is HttpWebRequest)
                 ((HttpWebRequest) request).CookieContainer = _cookies;
         }
+
         private void GetCookies(WebResponse response)
         {
             if (response is HttpWebResponse)
                 foreach (Cookie cookie in ((HttpWebResponse) response).Cookies)
                     _cookies.Add(response.ResponseUri, cookie);
         }
-        #endregion
+
+        #endregion Cookies Manager
 
         #region Connection Manager
-        private bool ConnectWithOffice(Uri uri, String user, String password)
+
+        private bool ConnectWithOffice(Uri uri, string user, string password)
         {
             throw new NotImplementedException();
         }
-        private bool ConnectWithUnix(Uri uri, String user, String password)
+
+        private bool ConnectWithUnix(Uri uri, string user, string password)
         {
-            var intraResponse = LoadUri(uri, NetworkMethod.Post, new Dictionary<String, Object>
+            var intraResponse = LoadUri(uri, NetworkMethod.Post, new Dictionary<string, object>
             {
-                { "login", user },
-                { "password", password }
+                {"login", user},
+                {"password", password}
             });
             return intraResponse.StatusCode == HttpStatusCode.OK;
         }
-        #endregion
 
-        public JToken DownloadJson(String uri)
-        {
-            var jsonResponse = LoadUri(new Uri(uri), NetworkMethod.Get, null);
-            var jsonContent = "";
-            using (var sResponse = new StreamReader(jsonResponse.GetResponseStream(), Encoding.UTF8))
-            {
-                jsonContent = sResponse.ReadToEnd();
-            }
-            return JToken.Parse(jsonContent);
-        }
-        public Boolean ConnectToApi(ConnectionManager manager, String uri, String user, String password)
-        {
-            uri.ArgumentNotNull(nameof(uri));
-            user.ArgumentNotNull(nameof(user));
-            password.ArgumentNotNull(nameof(password));
-
-            _cookies = new CookieContainer();
-            switch (manager)
-            {
-                case ConnectionManager.Office365:
-                    _connected = ConnectWithOffice(new Uri(uri), user, password);
-                    break;
-                case ConnectionManager.Classic:
-                    _connected = ConnectWithUnix(new Uri(uri), user, password);
-                    break;
-                default:
-                    _connected = false;
-                    break;
-            }
-            return _connected;
-        }
+        #endregion Connection Manager
     }
 }

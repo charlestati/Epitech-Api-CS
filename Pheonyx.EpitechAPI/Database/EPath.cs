@@ -1,45 +1,56 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Pheonyx.EpitechAPI.Utils;
 
 namespace Pheonyx.EpitechAPI.Database
 {
-
     public sealed class EPath
     {
-        private static readonly Int64 Start = -0x2;
-        private static readonly Int64 End = -0x4;
+        /// <summary>
+        /// Variable statique représentant l'état noeud initial.
+        /// </summary>
+        public static readonly Int32 Start = -0x2;
+        /// <summary>
+        /// Variable statique représentant l'état noeud final.
+        /// </summary>
+        public static readonly Int32 End = -0x4;
+        private readonly String[] _pathArray;
+        private readonly long _pathSize;
 
         private long _currentPath;
-        private readonly long _pathSize;
-        private readonly string _originPath;
-        private readonly string[] _pathArray;
 
+        /// <summary>
+        /// Initialise une nouvelle instance de la classe <see cref="EPath"/> qui est représenté par le chemin specifié.
+        /// </summary>
+        /// <param name="sPath">Chemin que doit parcourir l'instance <see cref="EPath"/>.</param>
         public EPath(String sPath)
         {
             sPath.ArgumentNotEmpty(nameof(sPath));
-            _originPath = sPath;
+            OriginPath = sPath;
             var lPathList = sPath.Split('.').ToList();
 
             for (var i = 0; i < lPathList.Count; i++)
             {
                 var subPath = lPathList[i];
-                if (subPath == String.Empty)
+                if (subPath == string.Empty)
                     throw new ArgumentException($"Invalid path: Key {i + 1} can't be empty in '{sPath}'.", nameof(sPath));
                 while (subPath.Contains('[', ']'))
                 {
                     var arrayPath = subPath.LastBetween('[', ']');
                     int iOut;
 
-                    if (!Int32.TryParse(arrayPath, out iOut))
-                        throw new ArgumentException($"Invalid path: Incorrect Array key '[{arrayPath}]' in '{sPath}'. Key must be of type Int32.", nameof(sPath));
+                    if (!int.TryParse(arrayPath, out iOut))
+                        throw new ArgumentException(
+                            $"Invalid path: Incorrect Array key '[{arrayPath}]' in '{sPath}'. Key must be of type Int32.",
+                            nameof(sPath));
                     lPathList.Insert(i + 1, subPath.LastBetween('[', ']'));
-                    lPathList[i] = subPath.Substring(0, subPath.LastIndexOf('[')) + subPath.Substring(subPath.LastIndexOf(']') + 1);
+                    lPathList[i] = subPath.Substring(0, subPath.LastIndexOf('[')) +
+                                   subPath.Substring(subPath.LastIndexOf(']') + 1);
 
                     subPath = lPathList[i];
-                    if (subPath == String.Empty)
-                        throw new ArgumentException($"Invalid path: Key {i + 1} can't be empty in '{sPath}'.", nameof(sPath));
+                    if (subPath == string.Empty)
+                        throw new ArgumentException($"Invalid path: Key {i + 1} can't be empty in '{sPath}'.",
+                            nameof(sPath));
                 }
             }
             _pathArray = lPathList.ToArray();
@@ -47,20 +58,56 @@ namespace Pheonyx.EpitechAPI.Database
             _currentPath = Start;
         }
 
-        public String OriginPath => _originPath;
+        public override String ToString()
+        {
+            return OriginPath;
+        }
+
+        public static implicit operator EPath(String sPath)
+        {
+            return new EPath(sPath);
+        }
+
+        public static implicit operator String(EPath ePath)
+        {
+            return ePath.ToString();
+        }
+
+        #region Properties
+
+        /// <summary>
+        /// Obtient une chaîne représentant le chemin original de l'instance.
+        /// </summary>
+        public String OriginPath { get; }
+
+        /// <summary>
+        /// Obtient une chaîne représentant l'état du chemin actuel.
+        /// </summary>
         public String CurrentPath => _currentPath < 0 ? null : _pathArray[_currentPath];
 
-        public Int32? CurrentRow
+        #endregion Properties
+
+        #region Move methods
+
+        /// <summary>
+        /// Obtient le numero du noeud actuel.
+        /// </summary>
+        public Int32 CurrentRow
         {
             get
             {
                 int row;
 
-                if (Int32.TryParse(CurrentPath, out row))
+                if (int.TryParse(CurrentPath, out row))
                     return row;
-                return null;
+                return End;
             }
         }
+
+        /// <summary>
+        /// Déplace le noeud d'une unité vers l'avant.
+        /// </summary>
+        /// <returns><c>true</c> si le noeud est arrivé à la fin du chemin; sinon, <c>false</c></returns>
         public Boolean MoveNext()
         {
             if (_currentPath >= _pathSize - 1 || _currentPath == End)
@@ -71,6 +118,11 @@ namespace Pheonyx.EpitechAPI.Database
                 _currentPath++;
             return _currentPath != End;
         }
+
+        /// <summary>
+        /// Déplace le noeud d'une unité vers l'arrière.
+        /// </summary>
+        /// <returns><c>true</c> si le noeud est arrivé au début du chemin; sinon, <c>false</c></returns>
         public Boolean MovePrev()
         {
             if (_currentPath == 0 || _currentPath == Start)
@@ -82,23 +134,14 @@ namespace Pheonyx.EpitechAPI.Database
             return _currentPath != Start;
         }
 
+        /// <summary>
+        /// Réinitialise le noeud actuel au début du chemin.
+        /// </summary>
         public void Reset()
         {
             _currentPath = Start;
         }
 
-        public override String ToString()
-        {
-            return _originPath;
-        }
-
-        public static implicit operator EPath(String sPath)
-        {
-            return new EPath(sPath);
-        }
-        public static implicit operator String(EPath ePath)
-        {
-            return ePath.ToString();
-        }
+        #endregion Move methods
     }
 }
