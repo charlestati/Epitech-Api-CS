@@ -11,7 +11,7 @@
   - [Build](#build)
   - [API Reference](#api-reference)
   - [Contribution](#contribution)
-    - [How to contribute ?](#how-to-contribute-?)
+    - [How to contribute ?](#how-to-contribute-)
     - [Discussion](#discussion)
     - [Bug reports](#bug-reports)
     - [Pull requests](#pull-requests)
@@ -50,7 +50,7 @@ var results = api.Database;
 
 ## API Reference
 
-See [API Reference document](https://github.com/pheonyx/Epitech-Api-CS/blob/master/API-REFENCE.md).
+See [API Reference document](https://github.com/pheonyx/Epitech-Api-CS/blob/master/API-REFERENCE.md).
 
 ## Contribution
 
