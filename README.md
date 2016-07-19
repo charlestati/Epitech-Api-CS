@@ -100,6 +100,9 @@ Pull request of features and bug fixes are both welcomed. Before you send a pull
 
 ## Todo
 
+### Release v1.1
+- [ ] Choice of configuration file to load
+
 ### Release v1.2
 - [ ] Connection with Office 365
 - [ ] Change Database system (Use inheritance of JSON.Net class)
