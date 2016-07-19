@@ -12,17 +12,27 @@ It's really simple to create new instance, but you need some explanation to conf
 
 ### Sample
 ```C#
-var api = new EpitechApi(new[] { HttpStatusCode.InternalServerError }); // I use this example to the rest of the manual
+var api = new EpitechApi(new[] { HttpStatusCode.InternalServerError }); // I use this example for the rest of the manual
 var withWebAgent = new EpitechApi("My Personnal Web Agent");
 var fullyBro = new EpitechApi(new TimeSpan(0, 0, 0, 0, 10), "No Agent", new[] { HttpStatusCode.InternalServerError, HttpStatusCode.RequestEntityTooLarge } )
 ```
 
 ## Authentification
-* Choisir son module de connexion
-  * Office365 pour se connecter avec un compte Microsoft Compatible
-  * Classique pour se connecter avec les identifiants habituels (Login / Password UNIX)
-* ConnectTo() => Permet de connecter l'API. Si il y a une erreur de connexion (url, identifiants), une exception sera faite et l'API ne sera pas connectée.
-* IsConnected => Propriété permetant de savoir si l'API est connectée
+There are two ways to authenticate:
+* With **Office365 authentification**, *but it's currently not implemented*.
+* With **Classic authentification**, *ie.* with Epitech Unix credentials (Login / Unix password)
+
+To authenticate the API, just one method is required: `ConnectTo()`.
+
+For that, specify :
+  - [X] `ConnectionManager` (**Office365** or **Classic**)
+  - [X] **URL** of Epitech login page
+  - [X] **User login** *(email address for Office365)*
+  - [X] **User password**
+
+**CAUTION**: When an error occurs, either the method returns `false` or there is an `Exception` *(depending on the source of the error)*. I advise to `try ... catch` this method.
+
+It also exist a property of `EpitechApi` that indicates whether the API is connected or not : `IsConnected` *(really difficult to find it, no ?)*
 
 ## Configure your API
 * ConfigureApi => Configure l'API. Prend en parametre le contenu des fichiers de config JSON (See [Configure JSON file section](#configure-json-file)).
