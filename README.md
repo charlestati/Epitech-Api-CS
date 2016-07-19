@@ -100,10 +100,16 @@ Pull request of features and bug fixes are both welcomed. Before you send a pull
 
 ## Todo
 
-* Connection with Office 365
-* Improve performance (Memory and Processor)
-* Add cross data features
-* Add multi-thread system
+### Release v1.2
+- [ ] Connection with Office 365
+- [ ] Change Database system (Use inheritance of JSON.Net class)
+
+### Release v1.3
+- [ ] Improve performance (Memory and Processor)
+
+### Release v2
+- [ ] Add cross data features
+- [ ] Add multi-thread system
 
 ## Copyright and License
 
