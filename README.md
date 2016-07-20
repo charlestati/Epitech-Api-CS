@@ -1,5 +1,5 @@
 # {API#TECH} - Epitech API Client Library for .NET
-[![Build status](https://ci.appveyor.com/api/projects/status/k1588qdnavy0365k?svg=true)](https://ci.appveyor.com/project/pheonyx/epitech-api-cs)
+[![Build status](https://ci.appveyor.com/api/projects/status/j3sjbecy331b02fx?svg=true)](https://ci.appveyor.com/project/pheonyx/epitech-api-cs)
 
 **{API#TECH}** is an API Client. It's goal is to **provides an easy way** to communicate with the Intranet Website of [Epitech school](http://www.epitech.eu/). It can be used to improve development of **Mobile** or **Desktop applications** for Studient, like Studient's Schedule manager.
 
