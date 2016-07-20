@@ -50,7 +50,10 @@ namespace Pheonyx.APITech.Database
             ItemCollection = null;
             _type = FindType(value);
             if (value == null || _type == EQueryType.Null)
-                _value = value as ENull ?? new ENull(ReasonType.InvalidValue, $"Invalid value ({value})");
+            {
+                _value = "(null)";
+                _type = EQueryType.String;
+            }
             else
                 _value = value;
         }

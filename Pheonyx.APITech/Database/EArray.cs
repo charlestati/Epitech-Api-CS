@@ -42,7 +42,7 @@ namespace Pheonyx.APITech.Database
         {
             get
             {
-                if (key > 0 && key < Count)
+                if (key >= 0 && key < Count)
                     return _instance[key];
                 return new ENull(ReasonType.InvalidKey, $"Key '{key}' out of range (< 0 or > {Count - 1})");
             }

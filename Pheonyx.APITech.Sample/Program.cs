@@ -23,6 +23,7 @@ namespace Pheonyx.APITech.Sample
         static Ui()
         {
             Console.OutputEncoding = Encoding.UTF8;
+            Console.ForegroundColor = ConsoleColor.Gray;
         }
 
         public static string Password(string m)
@@ -128,11 +129,15 @@ namespace Pheonyx.APITech.Sample
                         Displayer(query[i], tab + "\t");
                     }
                     break;
-                default:
+                case EQueryType.Null:
                     var none = query as ENull;
-                    Console.Write(none != null
-                        ? $" {none.Message} ({none.Reason})"
-                        : $" {(query as EValue).Value<dynamic>()}");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write($" {none.Message} ({none.Reason})");
+                    Console.ForegroundColor = ConsoleColor.Gray;
+                    break;
+                default:
+                    var value = query as EValue;
+                    Console.Write($" {value.Value<dynamic>()}");
                     break;
             }
         }
@@ -162,8 +167,8 @@ namespace Pheonyx.APITech.Sample
                 Ui.Checkbox("Configure API with UserInformation and UserList file");
                 api.ConfigureApi(new List<string>
                 {
-                    Reader("../../ConfigFiles/UserInformation.json"),
-                    Reader("../../ConfigFiles/UserList.json")
+                    Reader("../../ConfigFiles/UserList.json"),
+                    Reader("../../ConfigFiles/UserInformation.json")
                 });
                 Ui.Succeed();
 
@@ -229,8 +234,11 @@ namespace Pheonyx.APITech.Sample
             catch (Exception e)
             {
                 Ui.Failed();
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"> Exception: {e.GetType()}");
+                Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine($"\t{e.Message}");
+                Console.ForegroundColor = ConsoleColor.Gray;
                 Console.WriteLine($"{e.StackTrace}");
                 Ui.Continue();
             }
