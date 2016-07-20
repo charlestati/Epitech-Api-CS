@@ -1,0 +1,37 @@
+﻿{
+  "API-local-config": {
+    "API-dbName": "Modules",
+    "API-modules": [
+      {
+        "Name": "Modules",
+        "Url": "{EPITECH}/course/filter?format=json([&location[]={LOCATION}])([&course[]={COURSE}])([&scolaryear[]={YEAR}])"
+      }
+    ]
+  },
+  "Modules": {
+    "Modules": {
+      "Module": [
+        "",
+        {
+          "Name": "title",
+          "Code": "code",
+          "Instance": "codeinstance",
+          "Semester": "semester",
+          "Year": "scolaryear",
+          "CurrentPromo": "active_promo",
+          "Location": {
+            "City": "location_title",
+            "Code": "instance_location"
+          },
+          "Status": "status",
+          "Credits": "credits",
+          "Date": {
+            "Start": "begin",
+            "End": "end",
+            "Register": "end_register"
+          }
+        }
+      ]
+    }
+  }
+}

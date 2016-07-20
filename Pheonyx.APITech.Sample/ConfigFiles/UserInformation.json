@@ -1,0 +1,171 @@
+﻿{
+  "API-local-config": {
+    "API-dbName": "UserInformations",
+    "API-modules": [
+      {
+        "Name": "Personnal",
+        "Url": "{EPITECH}/user/{LOGIN}/?format=json"
+      },
+      {
+        "Name": "Grade",
+        "Url": "{EPITECH}/user/{LOGIN}/notes/?format=json"
+      },
+      {
+        "Name": "Flags",
+        "Url": "{EPITECH}/user/{LOGIN}/flags/?format=json"
+      },
+      {
+        "Name": "Notification",
+        "Url": "{EPITECH}/user/notification/message/?format=json"
+      },
+      {
+        "Name": "Alert",
+        "Url": "{EPITECH}/user/notification/alert/?format=json"
+      }
+    ]
+  },
+  "Personnal": {
+    "User": {
+      "Login": "login",
+      "UID": "uid",
+      "GID": "gid",
+      "LastName": "lastname",
+      "FirstName": "firstname",
+      "BirthDate": "userinfo.birthday.value",
+      "BirthPlace": "userinfo.birthplace.value",
+      "Address": "userinfo.address.value",
+      "City": "userinfo.city.value",
+      "Country": "userinfo.country.value",
+      "Info": {
+        "Job": "userinfo.job.value",
+        "Phone": "userinfo.telephone.value",
+        "Twitter": "userinfo.twitter.value",
+        "Facebook": "userinfo.facebook.value",
+        "Google+": "userinfo.googleplus.value",
+        "Website": "userinfo.website.value",
+        "Email": "userinfo.email.value"
+      },
+      "Picture": "picture",
+      "Promo": "promo",
+      "Credits": "credits",
+      "GPA": {
+        "Bachelor": "gpa[?(@.cycle=='bachelor')].gpa",
+        "Master": "gpa[?(@.cycle=='master')].gpa"
+      },
+      "Spice": {
+        "Available": "spice.available_spice",
+        "Consumed": "spice.consumed_spice"
+      },
+      "Adm": "admin"
+    },
+    "CurrentYear": {
+      "Year": "scolaryear",
+      "Course": "course_code",
+      "Semester": {
+        "Code": "semester_code",
+        "Value": "semester"
+      }
+    },
+    "School": {
+      "ID": "school_id",
+      "Code": "school_code",
+      "Title": "school_title",
+      "ID_Promo": "id_promo (+) (old_id_promo|,)",
+      "ID_Location": "old_id_location",
+      "Groups": [
+        "groups",
+        {
+          "Name": "name",
+          "Count": "count"
+        }
+      ]
+    }
+  },
+  "Grade": {
+    "User": {
+      "Note": [
+        "modules",
+        {
+          "Year": "scolaryear",
+          "Cycle": "cycle",
+          "Module": "codemodule",
+          "Instance": "codeinstance",
+          "Title": "title",
+          "DateRegister": "date_ins",
+          "Credit": "credits",
+          "Grade": "grade",
+          "Flag": "barrage"
+        }
+      ]
+    }
+  },
+  "Flags": {
+    "User": {
+      "Flags": {
+        "Medal": {
+          "Quantity": "flags.medal.nb",
+          "Modules": [
+            "flags.medal.modules",
+            {
+              "Name": "title"
+            }
+          ]
+        },
+        "Remarkable": {
+          "Quantity": "flags.remarkable.nb",
+          "Modules": [
+            "flags.remarkable.modules",
+            {
+              "Name": "title"
+            }
+          ]
+        },
+        "Difficulty": {
+          "Quantity": "flags.difficulty.nb",
+          "Modules": [
+            "flags.difficulty.modules",
+            {
+              "Name": "title"
+            }
+          ]
+        },
+        "Ghost": {
+          "Quantity": "flags.ghost.nb",
+          "Modules": [
+            "flags.ghost.modules",
+            {
+              "Name": "title"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "Notification": {
+    "Notification": {
+      "Message": [
+        "",
+        {
+          "Title": "title",
+          "Content": "content",
+          "Author": {
+            "Name": "user.title",
+            "Url": "user.url",
+            "Picture": "user.picture"
+          },
+          "Date": "date"
+        }
+      ]
+    }
+  },
+  "Alert": {
+    "Notification": {
+      "Alert": [
+        "",
+        {
+          "Message": "title"
+        }
+      ]
+    }
+  }
+}

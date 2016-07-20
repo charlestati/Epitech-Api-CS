@@ -1,0 +1,19 @@
+﻿{
+  "API-local-config": {
+    "API-dbName": "UserList",
+    "API-modules": [
+      {
+        "Name": "Users",
+        "Url": "{EPITECH}/user/filter/user?format=json&location={LOCATION}&year={YEAR}&course={COURSE}&count={COUNT}"
+      }
+    ]
+  },
+  "Users": {
+    "Users": [
+      "items",
+      {
+        "Login": "login"
+      }
+    ]
+  }
+}
