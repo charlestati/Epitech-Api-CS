@@ -318,3 +318,7 @@ Two **extensions** are availables: *Append* and *Split*.
 * **Split** : `(target.to.value|key)`
   * The result is an **EArray** containing the values splitted with key.
   * You can compine **Split** and **Apend**: `(target.to.value|key) (+) target.to.an.another.array (+) target.path.value`
+
+## Epitech JSON API
+
+Under construction, coming soon
