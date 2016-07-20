@@ -32,7 +32,7 @@ For that, specify :
   - [X] **User login** *(email address for Office365)*
   - [X] **User password**
 
-**CAUTION**: When an error occurs, either the method returns `false` or there is an `Exception` *(depending on the source of the error)*. I advise to `try ... catch` this method.
+> **CAUTION**: When an error occurs, either the method returns `false` or there is an `Exception` *(depending on the source of the error)*. I advise to `try … catch` this method.
 
 It also exist a property of `EpitechApi` that indicates whether the API is connected or not : `IsConnected` *(really difficult to find it, no ?)*
 
@@ -64,8 +64,8 @@ Finally, **to clean API** *(configuration and database loaded)*, `ClearApi()` ca
 try
 {
   api.ConfigureApi(new List<String>() {
-      "... JSON file content ...",
-      "... Another JSON file ..."
+      "… JSON file content …",
+      "… Another JSON file …"
     });
 }
 catch (Exception e)
@@ -80,13 +80,13 @@ Console.WriteLine("I'm configured ? {api.IsConfigured}"); // I'm configured ? fa
 
 ## Fill database API with results
 Now that the API is almost set, it's time to **retrieve the data**. For that, `LoadData()` allows you to receive the **desired data**.
-I describe the parameter in the [Configure JSON file](configure-json-file).
+I describe the parameter in the [Configure JSON file](#configure-json-file).
 
-**CAUTION**: Like [Authentification](authentification), when an error occurs, an `Exception` is sent. I advise to `try ... catch` this method.
+> **CAUTION**: Like [Authentification](authentification), when an error occurs, an `Exception` is sent. I advise to `try … catch` this method.
 
 Finally, `Database` property allows **to retrieve** the loaded database.
 
-**CAUTION**: To prevent unwanted changes, the database is locked with a `LockerManager`.
+> **CAUTION**: To prevent unwanted changes, the database is locked with a `LockerManager`.
 
 ### Sample Code
 ```C#
@@ -127,8 +127,14 @@ var db = api.Database;
 So, now, you are the loaded database. Great, but what to do with ? How to get data ?
 
 **Three way** is offered to you:
-* Usable like an `Array`. For example: To access *User → (Row) 2 → Name* in **db** ⇒ `db["User"][2]["Name"]`
-* Usable with `AccessTo()`. For example: To access *User → (Row) 2 → Name* in **db** ⇒ `db.AccessTo("User[2].Name")`
+* Usable like an `Array`. For example: To access *User → (Row) 2 → Name* in **db**
+```C#
+db["User"][2]["Name"]
+```
+* Usable with `AccessTo()`. For example: To access *User → (Row) 2 → Name* in **db**
+```C#
+db.AccessTo("User[2].Name")
+```
 * Usable with [`LINQ`](https://msdn.microsoft.com/en-us/library/bb397933.aspx). For example: To retrieve all name in *Users* if the name doesn't start with 'A' ⇒
 ```C#
 db["User"]
@@ -140,19 +146,136 @@ db["User"]
 
 ## Configure JSON file
 
-### Architecture
-* Partie configuration => Obligatoire
-  * API-local-config
-    * API-dbName => Nom du fichier (Utilisable lors du Release v1.1)
-    * API-modules => Liste des modules (pour faire plusieurs modules en fonction de se que l'on veut faire)
-      * Name => Nom du module
-      * Url => Url a utiliser lors du chargement de la BDD
-        * Variable possible : {NameOfVar}
-          * LoadData() => `{ "NameOfVar", "Value" }`
-          * Sample => "This is {GREEK}!" + `{ "GREEK", "SPARTA !!" }` => "This is SPARTA !!!"
-        * Variable récursive possible : ([&test={MultiVar}])
-          * LoadData() => `{ "MultiVar" , new List<String>() { "Value One", "Value Two" } }`
-          * Sample => "Where is Brian ? Brian is([ in {Where}])" + `{ "Where" , new List<String>() { "the kitchen,", "his house,", "his country,", "...", }}` = "Where is Brian ? Brian is in the kitchen, in his house, in his country, in ..."
+This part is the most abstract part of this, but also the most important to properly configure {API#TECH}. Toute la configuration des données à recevoir, ainsi que l'architecture de la base de donnée est décrite dans un fichier de configuration JSON.
+This one is divided in two part:
+
+### Mandatory Part
+This part contains all informations to link the API with the JSON file.
+
+```json
+{
+  "API-local-config": {
+    "API-dbName": "MyDBName",
+    "API-modules": [
+      {
+        "Name": "MyModuleName",
+        "Url": "UrlModule"
+      },
+      {
+        "Name": "MySecondModuleName",
+        "Url": "SecondUrlModule"
+      }
+    ]
+  }
+}
+```
+
+* API-dbName: Name of the configuration file (Usefull for the [Release v1.1](https://github.com/pheonyx/Epitech-Api-CS#release-v11))
+* API-modules: List of user module.
+  * Name: Name of the module. This is also the name of module root in the [second part](#module-part).
+  * Url: Url where module informations are located.
+
+If you want, you can create variable URL.
+For that, two tools are available for you :
+
+Simple variable : `{VarName}`
+---
+
+To use this, you must describe a definition in the parameter of [`LoadData()`](#fill-database-api-with-results) like `{ "VarName", "ValueName" }`.
+
+For example:
+
+**JSON**
+```json
+{
+  "Name": "SimpleVar",
+  "Url": "This is {GREEK}!"
+}
+```
+
+**C#**
+```c#
+api.LoadData(new Dictionnary() {
+    { "GREEK", "SPARTA !!" }
+  });
+```
+
+**Result**
+```c#
+Url = "This is SPARTA !!!"
+```
+
+Loop variable : `([... {VarName}])`
+---
+
+Loop variable is like simple variable, but you can define some value for just one key.
+
+So, to use it, you must describe a definition in the parameter of [`LoadData()`](#fill-database-api-with-results) like `{ "VarName", new List<String>() {"ValueNameOne", "ValueNameTwo"} }`.
+
+For example:
+
+**JSON**
+```json
+{
+  "Name": "LoopVar",
+  "Url": "Where is Brian ? Brian is([ in {Where}])"
+}
+```
+
+**C#**
+```c#
+api.LoadData(new Dictionnary() {
+    { "Where" , new List<String>()
+        { "the kitchen,", "his house,", "...", }
+    }
+  });
+```
+
+**Result**
+```c#
+Url = "Where is Brian ? Brian is in the kitchen, in his house, in ..."
+```
+
+Url variable combination
+---
+
+You can use also one variable for more than one url and you can use multiple variable in one url.
+
+For example:
+
+**JSON**
+```json
+{
+  "Name": "ModuleOne",
+  "Url": "{SimpleVar} with ([{MultiVar}, ])end"
+},
+{
+  "Name": "ModuleTwo",
+  "Url": "([{MultiVar}] | ) {SimpleVar} | {AnotherVar}"
+}
+```
+
+**C#**
+```c#
+api.LoadData(new Dictionnary() {
+  { "SimpleVar", "SV" },
+  { "MultiVar", new List<String>() {"A", "B", "C", "D"}},
+  { "AnotherVar", "Another variable"}
+  });
+```
+
+**Result**
+```c#
+ModuleOne.Url = "SV with A, B, C, D, end"
+ModuleTwo.Url = "A | B | C | D | SV | Another variable"
+```
+***
+### Module Part
+
+
+
+
+
 * Partie module
   * La racine de l'objet doit être forcément un nom de module
   * Le reste dépend de vous: Vous choissez quoi mettre, où voulez, ~~quand vous voulez~~. Pour récupérer les données, il ne suffira que d'utiliser l'architecture que vous avez fait.
