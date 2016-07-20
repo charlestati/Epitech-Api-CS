@@ -149,6 +149,7 @@ db["User"]
 This part is the most abstract part of this, but also the most important to properly configure {API#TECH}. Toute la configuration des données à recevoir, ainsi que l'architecture de la base de donnée est décrite dans un fichier de configuration JSON.
 This one is divided in two part:
 
+***
 ### Mandatory Part
 This part contains all informations to link the API with the JSON file.
 
@@ -269,23 +270,51 @@ api.LoadData(new Dictionnary() {
 ModuleOne.Url = "SV with A, B, C, D, end"
 ModuleTwo.Url = "A | B | C | D | SV | Another variable"
 ```
+
 ***
 ### Module Part
 
+This part has only one obligation: the module root must bear the name specified in module `API-local-config.API-modules.Name`. The rest depends only on you.
 
+You choose what to put where you want, ~~when you want~~.
+To retrieve the data, simply respected the architecture you created before.
 
+Oh and the end path value (you see what I mean ? No ? Look then the example), must be a way ["JPath"](#path-tools) heading towards the desired value contained in the file downloaded from the intranet.
 
+#### Sample
 
-* Partie module
-  * La racine de l'objet doit être forcément un nom de module
-  * Le reste dépend de vous: Vous choissez quoi mettre, où voulez, ~~quand vous voulez~~. Pour récupérer les données, il ne suffira que d'utiliser l'architecture que vous avez fait.
-  * Exemple: { "ModuleName", { "User" : { "Profil" : "target.path" }} }
+```Json
+"Module" : {
+  "User" : {
+    "Name" : "root.path.to.name.value",
+    "Promo" : "path.currentpromo (+) (path.to.promo.history|,)",
+    "Password" : "we.can.t.found.this"
+  },
+  "Netsoul" : {
+    "Active" : "path.to.netsoul",
+    "Dark" : "path.to.black.hole"
+  }
+}
+```
 
+```C#
+// Configure and load this JSON module
+var db = api.Database;
+var user = db.AccessTo("User.Name"); //EValue
+var promo = db["User"]["Promo"]; //EArray containing promotion value
+var none = db["None"]; //ENull containing the reason AccessFailure
+```
+
+***
 ### Path Tools
-  * Les éléments à recherché peuvent-être trouvé à l'aide du JPath
-  * Pour generer des EObject (Dictionnary), il suffit de faire un objet JSON ( "Key" : { })
-  * Pour generer des EArray (List), il faut que la cible soit un JSON array. Ensuite, il suffit d'utiliser une syntaxe spéciale: "Key" : [{"targetArray", {"Content0ne" : "one", "ContentTwo" : "two"}}]
-  * Pour generer des EValue, il faut juste de faire correspondre la cible à une clé: "Key" : "this.is.a.target"
-  * Il y a aussi quelques petits outils:
-    * Split d'une chaine (par exemple "a.target" = "a,b,c,d"): ("a.target"|,) => EArray {"a", "b", "c", "d"}
-    * Append deux EQuery (seulement EValue ou EArray): "a.target" (+) ("a.target"|,) => EArray {"a,b,c,d", "a", "b", "c", "d"}
+
+To facilitate the parsing of the values, the path to find the values are compatible JPath.
+
+Two **extensions** are availables: *Append* and *Split*.
+
+* **Append** : `target.path.value (+) target.path.anther.value`
+  * The result is an **EArray** containing the values appended.
+  * You can append **EArr**ay and **EValue** (for example `target.to.an.array (+) target.to.an.another.array (+) target.path.value`)
+* **Split** : `(target.to.value|key)`
+  * The result is an **EArray** containing the values splitted with key.
+  * You can compine **Split** and **Apend**: `(target.to.value|key) (+) target.to.an.another.array (+) target.path.value`
