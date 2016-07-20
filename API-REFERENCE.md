@@ -279,7 +279,7 @@ This part has only one obligation: the module root must bear the name specified 
 You choose what to put where you want, ~~when you want~~.
 To retrieve the data, simply respected the architecture you created before.
 
-Oh and the end path value (you see what I mean ? No ? Look then the example), must be a way ["JPath"](#path-tools) heading towards the desired value contained in the file downloaded from the intranet.
+Oh and the end path value (you see what I mean ? No ? Look then the example), must be a way ["JSONPath"](#path-tools) heading towards the desired value contained in the file downloaded from the intranet.
 
 #### Sample
 
@@ -308,7 +308,7 @@ var none = db["None"]; //ENull containing the reason AccessFailure
 ***
 ### Path Tools
 
-To facilitate the parsing of the values, the path to find the values are compatible JPath.
+To facilitate the parsing of the values, the path to find the values are compatible [JSONPath](http://goessner.net/articles/JsonPath/).
 
 Two **extensions** are availables: *Append* and *Split*.
 
