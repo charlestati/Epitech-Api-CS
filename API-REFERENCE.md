@@ -54,7 +54,7 @@ Console.WriteLine("I'm connected ? {api.IsConnected}"); // I'm connected ? true
 The configuration of {API#TECH} is mainly made through files JSON which let the free user choose which elements to get back (See [Configure JSON file](#configure-json-file)).
 
 In C#, this step is *really simple*. You must just use one method *(like the others steps, I know)*.
-`ConfigureApi()` just take a `List<String>`, in which **every row** is the content of one of your **JSON configuration file**. *(Yes, you must read-it before)*.
+`ConfigureApi()` just take a `List<String>`, in which **every row** is the content of one of your **JSON configuration file**. *(Yes, you must read it before)*.
 
 After that, the property `IsConfigured` can let you know if the **configuration is valid**.
 Finally, **to clean API** *(configuration and database loaded)*, `ClearApi()` can be your friend.
@@ -79,10 +79,31 @@ Console.WriteLine("I'm configured ? {api.IsConfigured}"); // I'm configured ? fa
 
 
 ## Fill database API with results
-* LoadData() => Charge les données dans la base de données en fonctions du fichier de configuration
-  * Varible pour charger les données (remplacement)
-* Verrouille automatiquement la BDD ou éviter toutes modifications externe
-* Database => Propriété qui retourne la base de donnée chargée
+Now that the API is almost set, it's time to **retrieve the data**. For that, `LoadData()` allows you to receive the **desired data**.
+I describe the parameter in the [Configure JSON file](configure-json-file).
+
+**CAUTION**: Like [Authentification](authentification), when an error occurs, an `Exception` is sent. I advise to `try ... catch` this method.
+
+Finally, `Database` property allows **to retrieve** the loaded database.
+
+**CAUTION**: To prevent unwanted changes, the database is locked with a `LockerManager`.
+
+### Sample Code
+```C#
+try
+{
+  api.LoadData(new Dictionnary<String, Object>() {
+      {"Var_One", "Value"},
+      {"Var_Two", new List<String>() {"Value_One", "Value_Two"}}
+    });
+}
+catch (Exception e)
+{
+  Console.WriteLine($"Exception: {e}");
+}
+var db = api.Database;
+```
+
 
 ## Use database results
 
@@ -103,12 +124,19 @@ Console.WriteLine("I'm configured ? {api.IsConfigured}"); // I'm configured ? fa
   * `Message`: Message containing description of error.
 
 ### Usage
-* Les resultats peuvent être utilisée de façon différente :
-  * Utilisable comme des tableaux: db["Key"]["Key"][Key]
-  * Utilisable avec une méthode: AccessTo("PathEngine")
-  * Utilisable avec LINQ: db.Where(q => q is EValue && ((EValue)q).Type == String).Select(q => q.Value<String>()).ToList();
+So, now, you are the loaded database. Great, but what to do with ? How to get data ?
 
-## Sample Code
+**Three way** is offered to you:
+* Usable like an `Array`. For example: To access *User → (Row) 2 → Name* in **db** ⇒ `db["User"][2]["Name"]`
+* Usable with `AccessTo()`. For example: To access *User → (Row) 2 → Name* in **db** ⇒ `db.AccessTo("User[2].Name")`
+* Usable with [`LINQ`](https://msdn.microsoft.com/en-us/library/bb397933.aspx). For example: To retrieve all name in *Users* if the name doesn't start with 'A' ⇒
+```C#
+db["User"]
+  .Where(u => u.Name is EValue && u.name.Type == String)
+  .Select(u => u.Name.Value<String>())
+  .Where(n => !n.StartsWith("A"))
+```
+
 
 ## Configure JSON file
 
