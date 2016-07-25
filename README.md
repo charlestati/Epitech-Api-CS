@@ -1,7 +1,7 @@
 # {API#TECH} - Epitech API Client Library for .NET
 [![Build status](https://ci.appveyor.com/api/projects/status/j3sjbecy331b02fx?svg=true)](https://ci.appveyor.com/project/pheonyx/epitech-api-cs)
 
-**{API#TECH}** is an API Client. It's goal is to **provides an easy way** to communicate with the Intranet Website of [Epitech school](http://www.epitech.eu/). It can be used to improve development of **Mobile** or **Desktop applications** for Studient, like Studient's Schedule manager.
+**{API#TECH}** is an API Client. Its goal is to **provide an easy way** to communicate with the Intranet Website of [Epitech school](http://www.epitech.eu/). It can be used to improve the development of **Mobile** or **Desktop applications** for Students, like Studients' Schedule manager.
 
 ***
 
@@ -12,7 +12,7 @@
   - [Build](#build)
   - [API Reference](#api-reference)
   - [Contribution](#contribution)
-    - [How to contribute ?](#how-to-contribute-)
+    - [How to contribute?](#how-to-contribute-)
     - [Discussion](#discussion)
     - [Bug reports](#bug-reports)
     - [Pull requests](#pull-requests)
@@ -56,7 +56,7 @@ See [API Reference document](https://github.com/pheonyx/Epitech-Api-CS/blob/mast
 ## Contribution
 
 ### How to contribute ?
-There are many ways to contribute to {API#TECH}.  The easiest way is to participate in discussion of features and issues. You can also contribute by sending pull requests of features or bug fixes to us.
+There are many ways to contribute to {API#TECH}.  The easiest way is to participate in discussions of features and issues. You can also contribute by sending pull requests of features or bug fixes to us.
 
 ### Discussion
 
@@ -71,7 +71,7 @@ When reporting a bug at the issue tracker, please use the [following template](h
 * A short description of the bug that becomes the issue title *  
 
 ### Description
-* Does the bug result in any actual functional issue, if so, what ? *
+* Does the bug result in any actual functional issue, if so, which one? *
 
 ### Minimal repro steps
 * What is the smallest, simplest set of steps to reproduce the issue. If needed, provide a project that demonstrates the issue. *  
