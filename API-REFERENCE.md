@@ -4,7 +4,7 @@ It is **fully configurable** in data to recover as well as their organization.
 
 
 ## New API instance
-It's really simple to create new instance, but you need some explanation to configure it. First of all, three arguments are possible but optional :
+It's really simple to create a new instance, but you need some explanation to configure it. First of all, three arguments are possible but optional :
 * **Maximum execution time** of web request *(default: 1'30)*
 * **Web agent** of API *(default: ".NET Epitech API")*
 * **HttpStatusCode(s) to ignore** during a WebRequest Exeption *(default: none)*
@@ -34,7 +34,7 @@ For that, specify :
 
 > **CAUTION**: When an error occurs, either the method returns `false` or there is an `Exception` *(depending on the source of the error)*. I advise to `try … catch` this method.
 
-It also exist a property of `EpitechApi` that indicates whether the API is connected or not : `IsConnected` *(really difficult to find it, no ?)*
+There also is a property of `EpitechApi` that indicates whether the API is connected or not : `IsConnected` *(really difficult to find it, no ?)*
 
 ### Sample Code
 ```C#
@@ -51,7 +51,7 @@ Console.WriteLine("I'm connected ? {api.IsConnected}"); // I'm connected ? true
 
 
 ## Configure your API
-The configuration of {API#TECH} is mainly made through files JSON which let the free user choose which elements to get back (See [Configure JSON file](#configure-json-file)).
+The configuration of {API#TECH} is mainly made through JSON files which let the user choose which elements to get (See [Configure JSON file](#configure-json-file)).
 
 In C#, this step is *really simple*. You must just use one method *(like the others steps, I know)*.
 `ConfigureApi()` just take a `List<String>`, in which **every row** is the content of one of your **JSON configuration file**. *(Yes, you must read it before)*.
@@ -84,7 +84,7 @@ I describe the parameter in the [Configure JSON file](#configure-json-file).
 
 > **CAUTION**: Like [Authentification](authentification), when an error occurs, an `Exception` is sent. I advise to `try … catch` this method.
 
-Finally, `Database` property allows **to retrieve** the loaded database.
+Finally, the `Database` property allows **to retrieve** the loaded database.
 
 > **CAUTION**: To prevent unwanted changes, the database is locked with a `LockerManager`.
 
@@ -124,9 +124,9 @@ var db = api.Database;
   * `Message`: Message containing description of error.
 
 ### Usage
-So, now, you are the loaded database. Great, but what to do with ? How to get data ?
+So, now, you have the loaded database. Great, but what to do with ? How to get data ?
 
-**Three way** is offered to you:
+**Three ways** are offered to you:
 * Usable like an `Array`. For example: To access *User → (Row) 2 → Name* in **db**
 ```C#
 db["User"][2]["Name"]
@@ -146,7 +146,7 @@ db["User"]
 
 ## Configure JSON file
 
-This part is the most abstract part of this, but also the most important to properly configure {API#TECH}. Toute la configuration des données à recevoir, ainsi que l'architecture de la base de donnée est décrite dans un fichier de configuration JSON.
+This part is the most abstract part of this, but also the most important to properly configure {API#TECH}. All the configuration of the data to receive as well as the architecture of the database is described in a JSON configuration file.
 This one is divided in two part:
 
 ***
@@ -277,9 +277,9 @@ ModuleTwo.Url = "A | B | C | D | SV | Another variable"
 This part has only one obligation: the module root must bear the name specified in module `API-local-config.API-modules.Name`. The rest depends only on you.
 
 You choose what to put where you want, ~~when you want~~.
-To retrieve the data, simply respected the architecture you created before.
+To retrieve the data, simply respect the architecture you created before.
 
-Oh and the end path value (you see what I mean ? No ? Look then the example), must be a way ["JSONPath"](#path-tools) heading towards the desired value contained in the file downloaded from the intranet.
+Oh and the end path value (you see what I mean ? No ? Then look the example), must be a way ["JSONPath"](#path-tools) heading towards the desired value contained in the file downloaded from the intranet.
 
 #### Sample
 
